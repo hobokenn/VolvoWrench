@@ -27,6 +27,7 @@ namespace VolvoWrench.Demo_stuff.GoldSource
 			LOADED_MODULES,
 			CUSTOM_TRIGGER_COMMAND,
 			EDICTS,
+			PLAYERHEALTH,
 		}
 
 		[Serializable]
@@ -178,6 +179,17 @@ namespace VolvoWrench.Demo_stuff.GoldSource
 			public override void Read(BinaryReader br)
 			{
 				edicts = br.ReadInt32();
+			}
+		}
+
+		[Serializable]
+		public class PlayerHealth : BXTData
+		{
+			public int playerhealth;
+
+			public override void Read(BinaryReader br)
+			{
+				playerhealth = br.ReadInt32();
 			}
 		}
 
