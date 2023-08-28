@@ -24,7 +24,7 @@ namespace VolvoWrench.Demo_stuff.GoldSource.Verify
             categories = new List<Category>();
             BaseCvarRules = new List<Cvar>();
             JObject jsonfile = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(file));
-            jsonfile["bxt_version"] = bxt_version;
+            bxt_version = (string)jsonfile["bxt_version"];
             var cats = (JArray)jsonfile["categories"];
             foreach(var rule in (JArray)jsonfile["base_command_rules"])
             {
@@ -33,6 +33,8 @@ namespace VolvoWrench.Demo_stuff.GoldSource.Verify
                     BaseRules.Add(new Tuple<string, Commandtype>(rule["command"].ToString(),
                     (Commandtype)Enum.Parse(typeof(Commandtype), rule["rule"].ToString())));
                 }
+                // create a separate json object "base_cvar_rules" like i did before?
+                // to avoid confusion ofc
                 else
                 {
                     BaseCvarRules.Add(new Cvar(rule as JObject));

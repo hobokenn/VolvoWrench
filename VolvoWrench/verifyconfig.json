@@ -1,5 +1,5 @@
 ﻿{
-	"bxt_version": "f0c92ed4fd32ec77882007db58d826f81ffe4dc4-CLEAN based on mar-21-2020-1-gf0c92ed",
+	"bxt_version": "abf3d6c50f7b3dfcf972c57fba555278fdc1653a-CLEAN based on jul-23-2023",
 	"categories": [
 		{
 			"name": "Scriptless",
@@ -57,10 +57,6 @@
 				{
 					"cvar": "cl_pitchup",
 					"value": "89"
-				},
-				{
-					"cvar": "w",
-					"value": "0"
 				}
 			]
 		},
@@ -101,10 +97,7 @@
 				}
 			],
 			"cvar_rules": [
-				{
-					"cvar": "w",
-					"value": "(from: 0 to: 36000000)"
-				}
+
 			]
 		},
 		{
@@ -1263,9 +1256,7 @@
 		{
 			"command": "writeip",
 			"rule": "ALLOWED"
-		}
-	],
-	"cvar_rules": [
+		},
 		{
 			"cvar": "bxt_taslog",
 			"value": "0"
@@ -1337,14 +1328,6 @@
 		{
 			"cvar": "_bxt_taslog",
 			"value": "0"
-		},
-		{
-			"cvar": "ati_npatch",
-			"value": "(0;1)"
-		},
-		{
-			"cvar": "bgmvolume",
-			"value": "(0;1)"
 		},
 		{
 			"cvar": "bitmapfonts",
@@ -1464,27 +1447,27 @@
 		},
 		{
 			"cvar": "c_maxdistance",
-			"value": "200"
+			"value": "200.0"
 		},
 		{
 			"cvar": "c_maxpitch",
-			"value": "90"
+			"value": "90.0"
 		},
 		{
 			"cvar": "c_maxyaw",
-			"value": "135"
+			"value": "135.0"
 		},
 		{
 			"cvar": "c_mindistance",
-			"value": "30"
+			"value": "30.0"
 		},
 		{
 			"cvar": "c_minpitch",
-			"value": "0"
+			"value": "0.0"
 		},
 		{
 			"cvar": "c_minyaw",
-			"value": "-135"
+			"value": "-135.0"
 		},
 		{
 			"cvar": "cam_cvar",
@@ -1660,7 +1643,7 @@
 		},
 		{
 			"cvar": "cl_slist",
-			"value": "10"
+			"value": "10.0"
 		},
 		{
 			"cvar": "cl_smoothtime",
@@ -1719,16 +1702,8 @@
 			"value": "(0;1)"
 		},
 		{
-			"cvar": "console",
-			"value": "(0;1)"
-		},
-		{
 			"cvar": "coop",
 			"value": "0"
-		},
-		{
-			"cvar": "crosshair",
-			"value": "(0;1)"
 		},
 		{
 			"cvar": "d_spriteskip",
@@ -1772,11 +1747,11 @@
 		},
 		{
 			"cvar": "fakelag",
-			"value": "0"
+			"value": "0.0"
 		},
 		{
 			"cvar": "fakeloss",
-			"value": "0"
+			"value": "0.0"
 		},
 		{
 			"cvar": "fps_max",
@@ -1899,10 +1874,6 @@
 			"value": "(0;1)"
 		},
 		{
-			"cvar": "hisound",
-			"value": "(0;1)"
-		},
-		{
 			"cvar": "host_framerate",
 			"value": "0"
 		},
@@ -1917,10 +1888,6 @@
 		{
 			"cvar": "host_speeds",
 			"value": "0"
-		},
-		{
-			"cvar": "HostMap",
-			"value": "C1A0"
 		},
 		{
 			"cvar": "hostport",
@@ -1954,10 +1921,7 @@
 			"cvar": "hud_takesshots",
 			"value": "(0;1)"
 		},
-		{
-			"cvar": "ip",
-			"value": "localhost"
-		},
+
 		{
 			"cvar": "ip_clientport",
 			"value": "0"
@@ -2004,19 +1968,15 @@
 		},
 		{
 			"cvar": "joyforwardsensitivity",
-			"value": "-1"
+			"value": "-1.0"
 		},
 		{
 			"cvar": "joyforwardthreshold",
 			"value": "0.15"
 		},
 		{
-			"cvar": "joyname",
-			"value": "joystick"
-		},
-		{
 			"cvar": "joypitchsensitivity",
-			"value": "1"
+			"value": "1.0"
 		},
 		{
 			"cvar": "joypitchthreshold",
@@ -2024,7 +1984,7 @@
 		},
 		{
 			"cvar": "joysidesensitivity",
-			"value": "-1"
+			"value": "-1.0"
 		},
 		{
 			"cvar": "joysidethreshold",
@@ -2036,15 +1996,15 @@
 		},
 		{
 			"cvar": "joywwhack1",
-			"value": "0"
+			"value": "0.0"
 		},
 		{
 			"cvar": "joywwhack2",
-			"value": "0"
+			"value": "0.0"
 		},
 		{
 			"cvar": "joyyawsensitivity",
-			"value": "-1"
+			"value": "-1.0"
 		},
 		{
 			"cvar": "joyyawthreshold",
@@ -2063,21 +2023,14 @@
 			"value": "(0;1)"
 		},
 		{
-			"cvar": "logsdir",
-			"value": "logs"
-		},
-		{
 			"cvar": "lookspring",
-			"value": "0"
+			"value": "0.000000"
 		},
 		{
 			"cvar": "lookstrafe",
-			"value": "0"
+			"value": "0.000000"
 		},
-		{
-			"cvar": "lservercfgfile",
-			"value": "listenserver.cfg"
-		},
+
 		{
 			"cvar": "m_filter",
 			"value": "(0;1)"
@@ -2086,17 +2039,11 @@
 			"cvar": "m_rawinput",
 			"value": "(0;1)"
 		},
-		{
-			"cvar": "mapchangecfgfile",
-			"value": ""
-		},
-		{
-			"cvar": "mapcyclefile",
-			"value": "mapcycle.txt"
-		},
+
+
 		{
 			"cvar": "max_queries_sec",
-			"value": "3"
+			"value": "3.0"
 		},
 		{
 			"cvar": "max_queries_sec_global",
@@ -2106,14 +2053,7 @@
 			"cvar": "max_queries_window",
 			"value": "60"
 		},
-		{
-			"cvar": "model",
-			"value": "gordon"
-		},
-		{
-			"cvar": "motdfile",
-			"value": "motd.txt"
-		},
+
 		{
 			"cvar": "mp_allowmonsters",
 			"value": "0"
@@ -2170,10 +2110,7 @@
 			"cvar": "mp_logfile",
 			"value": "1"
 		},
-		{
-			"cvar": "mp_teamlist",
-			"value": "hgrunt;scientist"
-		},
+
 		{
 			"cvar": "mp_teamoverride",
 			"value": "1"
@@ -2308,10 +2245,6 @@
 			"value": "(0;1)"
 		},
 		{
-			"cvar": "rate",
-			"value": "(from: 1000 to: 25000)"
-		},
-		{
 			"cvar": "s_show",
 			"value": "0"
 		},
@@ -2345,7 +2278,7 @@
 		},
 		{
 			"cvar": "scr_printspeed",
-			"value": "0"
+			"value": "8"
 		},
 		{
 			"cvar": "sdl_double_click_size",
@@ -2359,10 +2292,7 @@
 			"cvar": "sensitivity",
 			"value": "(from: 0 to: 20)"
 		},
-		{
-			"cvar": "servercfgfile",
-			"value": "server.cfg"
-		},
+
 		{
 			"cvar": "showpause",
 			"value": "(0;1)"
@@ -2489,11 +2419,11 @@
 		},
 		{
 			"cvar": "sk_bigmomma_health_factor1",
-			"value": "1"
+			"value": "1.0"
 		},
 		{
 			"cvar": "sk_bigmomma_health_factor2",
-			"value": "1.500"
+			"value": "1.5"
 		},
 		{
 			"cvar": "sk_bigmomma_health_factor3",
@@ -3367,10 +3297,7 @@
 			"cvar": "skill",
 			"value": "(1;2;3)"
 		},
-		{
-			"cvar": "skin",
-			"value": "0"
-		},
+
 		{
 			"cvar": "snd_noextraupdate",
 			"value": "(0;1)"
@@ -3488,20 +3415,12 @@
 			"value": "0.5"
 		},
 		{
-			"cvar": "sv_maxupdaterate",
-			"value": "30"
-		},
-		{
 			"cvar": "sv_maxvelocity",
 			"value": "2000"
 		},
 		{
 			"cvar": "sv_minrate",
 			"value": "0"
-		},
-		{
-			"cvar": "sv_minupdaterate",
-			"value": "10"
 		},
 		{
 			"cvar": "sv_newunit",
@@ -3511,10 +3430,7 @@
 			"cvar": "sv_outofdatetime",
 			"value": "1800"
 		},
-		{
-			"cvar": "sv_password",
-			"value": ""
-		},
+
 		{
 			"cvar": "sv_proxies",
 			"value": "1"
@@ -3544,18 +3460,6 @@
 			"value": "(0;1)"
 		},
 		{
-			"cvar": "sv_skycolor_b",
-			"value": "(from: 0 to: 255)"
-		},
-		{
-			"cvar": "sv_skycolor_g",
-			"value": "(from: 0 to: 255)"
-		},
-		{
-			"cvar": "sv_skycolor_r",
-			"value": "(from: 0 to: 255)"
-		},
-		{
 			"cvar": "sv_spectatormaxspeed",
 			"value": "500"
 		},
@@ -3572,12 +3476,8 @@
 			"value": "100"
 		},
 		{
-			"cvar": "sv_unlag",
-			"value": "(0;1)"
-		},
-		{
 			"cvar": "sv_unlagpush",
-			"value": "0"
+			"value": "0.0"
 		},
 		{
 			"cvar": "sv_unlagsamples",
@@ -3601,7 +3501,7 @@
 		},
 		{
 			"cvar": "sys_ticrate",
-			"value": "100"
+			"value": "100.0"
 		},
 		{
 			"cvar": "texgamma",

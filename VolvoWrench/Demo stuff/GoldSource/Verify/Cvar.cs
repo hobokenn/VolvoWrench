@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,6 +47,7 @@ namespace VolvoWrench.Demo_stuff.GoldSource.Verify
             {
                 string name = obj["cvar"].ToString().Trim();
                 string value = obj["value"].ToString().Trim();
+                id = name;
                 if (value.Contains("from"))
                 {
                     //From-to value
@@ -54,8 +56,8 @@ namespace VolvoWrench.Demo_stuff.GoldSource.Verify
 
                     if (vals.Count != 2)
                         throw new Exception($"Mallformed json value: {value}");
-                    lowerbound = double.Parse(vals[0].Value);
-                    upperbound = double.Parse(vals[1].Value);
+                    lowerbound = double.Parse(vals[0].Value, CultureInfo.InvariantCulture);
+                    upperbound = double.Parse(vals[1].Value, CultureInfo.InvariantCulture);
                 }
                 else if(value.Contains(";") && value.EndsWith(")") && value.StartsWith("("))
                 {
@@ -86,7 +88,7 @@ namespace VolvoWrench.Demo_stuff.GoldSource.Verify
                 }
                 case CVartype.RANGE:
                 {
-                   var val = double.Parse(value);
+                   var val = double.Parse(value, CultureInfo.InvariantCulture);
                    return val >= lowerbound && val <= upperbound;
                 }
             }

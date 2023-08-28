@@ -49,6 +49,8 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                 return;
             }
 
+            bxtver.selectedCategory = CategoryCB.SelectedItem.ToString();
+
             var of = new OpenFileDialog
             {
                 Title = $"Please select the demos to analyze [{CategoryCB.SelectedItem.ToString()}]",
@@ -92,7 +94,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             {
                 ni.Icon = SystemIcons.Exclamation;
                 ni.Visible = true;
-                ni.ShowBalloonTip(5000, "VolvoWrench", "Demo names copied to clipboard", ToolTipIcon.Info);
+                ni.ShowBalloonTip(1000, "VolvoWrench", "Demo names copied to clipboard", ToolTipIcon.Info);
             }
         }
 
@@ -165,7 +167,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                     mrtb.AppendText("\nBXTData:");
                     var verif = bxtver.ParseBxtData(dem);
                     mrtb.AppendText("\n" + verif.Item2);
-                    BXTTreeView.Nodes.Clear();
                     BXTTreeView.Nodes.Add(verif.Item1);
                 }
             }
@@ -178,6 +179,16 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
 
         private void Verification_DragDrop(object sender, DragEventArgs e)
         {
+            if (CategoryCB.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a category!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            Console.WriteLine($"CategoryCB.SelectedItem is {CategoryCB.SelectedItem}");
+            bxtver.selectedCategory = CategoryCB.SelectedItem.ToString();
+
+
             var dropfiles = (string[]) e.Data.GetData(DataFormats.FileDrop);
             Verify(dropfiles);
             e.Effect = DragDropEffects.None;
@@ -198,6 +209,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to load config!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine($"ex.what ");
             }
         }
 

@@ -26,6 +26,9 @@ namespace VolvoWrench.Demo_stuff.GoldSource
 			GAME_END_MARKER,
 			LOADED_MODULES,
 			CUSTOM_TRIGGER_COMMAND,
+			EDICTS,
+			PLAYERHEALTH,
+			SPLIT_MARKER,
 		}
 
 		[Serializable]
@@ -231,7 +234,65 @@ namespace VolvoWrench.Demo_stuff.GoldSource
             }
         }
 
-		public abstract class BXTData
+        [Serializable]
+		public class Edicts : BXTData
+        {
+			public int edicts;
+
+			public override void Read(BinaryReader br)
+            {
+				edicts = br.ReadInt32();
+            }
+
+            public override string[] ToString()
+            {
+                return new [] {$"Max edicts: {edicts}"};
+			}
+        }
+
+        [Serializable]
+        public class PlayerHealth : BXTData
+        {
+            public int playerhealth;
+
+            public override void Read(BinaryReader br)
+            {
+                playerhealth = br.ReadInt32();
+            }
+
+            public override string[] ToString()
+            {
+                return new[] { $"Player health: {playerhealth}" };
+            }
+        }
+
+        [Serializable]
+        public class SplitMarker : BXTData
+        {
+            public Point3D corner_min;
+            public Point3D corner_max;
+            public string name;
+			public string map_name;
+
+            public override void Read(BinaryReader br)
+            {
+                corner_min = new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+                corner_max = new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle());
+				// UTF-8? yeah-nah? nah-yeah?
+                name = new string(br.ReadChars(br.ReadInt32()));
+				map_name = new string(br.ReadChars(br.ReadInt32()));
+            }
+
+            public override string[] ToString()
+            {
+                return new[]
+                {
+                    $"Split trigger [name:{name}] - [map name: {map_name}] - corner_min[{corner_min.X},{corner_min.Y},{corner_min.Z}] - corner_max[{corner_max.X},{corner_max.Y},{corner_max.Z}]"
+                };
+            }
+        }
+
+        public abstract class BXTData
 		{
 			/// <summary>
 			/// Read the data.
