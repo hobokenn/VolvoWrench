@@ -736,6 +736,10 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 {"VID_D3D", "0"},
                 {"WATERROOM_TYPE", "14"}
             };
+            foreach (var cvar in (((Bxt.CVarValues)info.Value.GsDemoInfo.IncludedBXtData[0].Objects[1].Value).CVars)) //cvars always located in 1st dataframe 2nd object
+            {
+                if(cvar.Key == "bxt_bhopcap_prediction") cvarRules["BXT_BHOPCAP"] = "1";
+            }
             var demonode = new TreeNode(Path.GetFileName(info.Key)) { ForeColor = Color.LightCoral };
             for (int i = 0; i < info.Value.GsDemoInfo.IncludedBXtData.Count; i++)
             {
