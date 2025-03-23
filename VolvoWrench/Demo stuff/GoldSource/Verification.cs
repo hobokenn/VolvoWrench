@@ -317,6 +317,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 {"EX_INTERP", "0.1"},
                 {"FAKELAG", "0.0"},
                 {"FAKELOSS", "0.0"},
+                {"FPS_OVERRIDE", "0"},
                 {"FS_LAZY_PRECACHE", "0"},
                 {"FS_PERF_WARNINGS", "0"},
                 {"FS_PRECACHE_TIMINGS", "0"},
@@ -738,7 +739,11 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             };
             foreach (var cvar in (((Bxt.CVarValues)info.Value.GsDemoInfo.IncludedBXtData[0].Objects[1].Value).CVars)) //cvars always located in 1st dataframe 2nd object
             {
-                if(cvar.Key == "bxt_bhopcap_prediction") cvarRules["BXT_BHOPCAP"] = "1";
+                if(cvar.Key == "bxt_bhopcap_prediction")    //Only registered in steam versions
+                {
+                    cvarRules["BXT_BHOPCAP"] = "1";
+                    cvarRules.Remove("FPS_OVERRIDE");
+                }
             }
             var demonode = new TreeNode(Path.GetFileName(info.Key)) { ForeColor = Color.LightCoral };
             for (int i = 0; i < info.Value.GsDemoInfo.IncludedBXtData.Count; i++)
