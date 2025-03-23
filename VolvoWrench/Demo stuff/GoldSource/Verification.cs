@@ -652,6 +652,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 {"SK_ZOMBIE_HEALTH1", "50"},
                 {"SK_ZOMBIE_HEALTH2", "50"},
                 {"SK_ZOMBIE_HEALTH3", "100"},
+                {"SKILL", "1"},
                 {"SND_SHOW", "0"},
                 {"SV_ACCELERATE", "10"},
                 {"SV_AIRACCELERATE", "10"},
