@@ -700,6 +700,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                     cvarRules.Remove("FPS_OVERRIDE");
                 }
             }
+            if(info.Value.GsDemoInfo.Header.MapName.StartsWith("ba_"))  //blue shift map
+            {
+                cvarRules["SK_BATTERY1"] = "20";
+                cvarRules["SK_BATTERY2"] = "20";
+                cvarRules["SK_BATTERY3"] = "20";
+            }
             var demonode = new TreeNode(Path.GetFileName(info.Key)) { ForeColor = Color.LightCoral };
             for (int i = 0; i < info.Value.GsDemoInfo.IncludedBXtData.Count; i++)
             {
