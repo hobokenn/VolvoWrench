@@ -399,6 +399,49 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 {"SCR_OFSY", "0"},
                 {"SCR_OFSZ", "0"},
                 {"SCR_PRINTSPEED", "8"},
+                {"SKILL", "1"},
+                {"SND_SHOW", "0"},
+                {"SV_ACCELERATE", "10"},
+                {"SV_AIRACCELERATE", "10"},
+                {"SV_AIRMOVE", "1"},
+                {"SV_AUTORECORD", "県"},
+                {"SV_EXPLOSION_DISPLAY", "県"},
+                {"SV_BOUNCE", "1"},
+                {"SV_CHEATS", "0"},
+                {"SV_CLIPMODE", "0"},
+                {"SV_FRICTION", "4"},
+                {"SV_GRAVITY", "800"},
+                {"SV_LAN", "1"},
+                {"SV_LOG_ONEFILE", "0"},
+                {"SV_LOG_SINGLEPLAYER", "0"},
+                {"SV_LOGBANS", "0"},
+                {"SV_LOGBLOCKS", "0"},
+                {"SV_LOGRELAY", "0"},
+                {"SV_MAXSPEED", "320"},
+                {"SV_MAXUNLAG", "0.5"},
+                {"SV_MAXVELOCITY", "2000"},
+                {"SV_NEWUNIT", "0"},
+                {"SV_RCON_BANPENALTY", "0"},
+                {"SV_RCON_MAXFAILURES", "10"},
+                {"SV_RCON_MINFAILURES", "5"},
+                {"SV_RCON_MINFAILURETIME", "30"},
+                {"SV_REGION", "-1"},
+                {"SV_SPECTATORMAXSPEED", "500"},
+                {"SV_STATS", "1"},
+                {"SV_STEPSIZE", "18"},
+                {"SV_STOPSPEED", "100"},
+                {"SV_UNLAGPUSH", "0.0"},
+                {"SV_VOICECODEC", "VOICE_MILES"},
+                {"SV_VOICEQUALITY", "3"},
+                {"SV_WATERACCELERATE", "10"},
+                {"SV_WATERAMP", "0"},
+                {"SV_WATERFRICTION", "1"},
+                {"SYS_TICRATE", "100.0"},
+                {"VID_D3D", "0"}
+            };
+
+            var skillCvarRules = new Dictionary<string, string>()
+            {
                 {"SK_12MM_BULLET1", "8"},
                 {"SK_12MM_BULLET2", "10"},
                 {"SK_12MM_BULLET3", "10"},
@@ -834,45 +877,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 {"SK_ZOMBIE_SOLDIER_HEALTH1", "60"},
                 {"SK_ZOMBIE_SOLDIER_HEALTH2", "60"},
                 {"SK_ZOMBIE_SOLDIER_HEALTH3", "120"},
-                {"SKILL", "1"},
-                {"SND_SHOW", "0"},
-                {"SV_ACCELERATE", "10"},
-                {"SV_AIRACCELERATE", "10"},
-                {"SV_AIRMOVE", "1"},
-                {"SV_AUTORECORD", "県"},
-                {"SV_EXPLOSION_DISPLAY", "県"},
-                {"SV_BOUNCE", "1"},
-                {"SV_CHEATS", "0"},
-                {"SV_CLIPMODE", "0"},
-                {"SV_FRICTION", "4"},
-                {"SV_GRAVITY", "800"},
-                {"SV_LAN", "1"},
-                {"SV_LOG_ONEFILE", "0"},
-                {"SV_LOG_SINGLEPLAYER", "0"},
-                {"SV_LOGBANS", "0"},
-                {"SV_LOGBLOCKS", "0"},
-                {"SV_LOGRELAY", "0"},
-                {"SV_MAXSPEED", "320"},
-                {"SV_MAXUNLAG", "0.5"},
-                {"SV_MAXVELOCITY", "2000"},
-                {"SV_NEWUNIT", "0"},
-                {"SV_RCON_BANPENALTY", "0"},
-                {"SV_RCON_MAXFAILURES", "10"},
-                {"SV_RCON_MINFAILURES", "5"},
-                {"SV_RCON_MINFAILURETIME", "30"},
-                {"SV_REGION", "-1"},
-                {"SV_SPECTATORMAXSPEED", "500"},
-                {"SV_STATS", "1"},
-                {"SV_STEPSIZE", "18"},
-                {"SV_STOPSPEED", "100"},
-                {"SV_UNLAGPUSH", "0.0"},
-                {"SV_VOICECODEC", "VOICE_MILES"},
-                {"SV_VOICEQUALITY", "3"},
-                {"SV_WATERACCELERATE", "10"},
-                {"SV_WATERAMP", "0"},
-                {"SV_WATERFRICTION", "1"},
-                {"SYS_TICRATE", "100.0"},
-                {"VID_D3D", "0"}
             };
             foreach (var cvar in (((Bxt.CVarValues)info.Value.GsDemoInfo.IncludedBXtData[0].Objects[1].Value).CVars)) //cvars always located in 1st dataframe 2nd object
             {
@@ -884,10 +888,19 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             }
             if (info.Value.GsDemoInfo.Header.MapName.StartsWith("ba_"))  //blue shift map
             {
-                cvarRules["SK_BATTERY1"] = "20";
-                cvarRules["SK_BATTERY2"] = "20";
-                cvarRules["SK_BATTERY3"] = "20";
+                skillCvarRules["SK_BATTERY2"] = "20";
+                skillCvarRules["SK_BATTERY3"] = "20";
+                skillCvarRules["SK_BATTERY1"] = "20";
             }
+
+            string gamedir = info.Value.GsDemoInfo.Header.GameDir;
+            bool gameLooksLikeTrilogy = gamedir.StartsWith("valve") || gamedir.StartsWith("gearbox") || gamedir.StartsWith("bshift");
+
+            if (gameLooksLikeTrilogy)
+            {
+                skillCvarRules.ToList().ForEach(x => cvarRules.Add(x.Key, x.Value));
+            }
+
             var demonode = new TreeNode(Path.GetFileName(info.Key)) { ForeColor = Color.LightCoral };
             for (int i = 0; i < info.Value.GsDemoInfo.IncludedBXtData.Count; i++)
             {
@@ -900,7 +913,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                         case Bxt.RuntimeDataType.VERSION_INFO:
                             {
                                 ret +=("\t" + "BXT Version: " + ((((Bxt.VersionInfo)t.Value).bxt_version == bxtVersion) ? "Latest (November 11th 2024)" : ("INVALID=" + ((Bxt.VersionInfo)t.Value).bxt_version)) + "\n");
-                                ret += ("\t" + "Game Version: " + ((Bxt.VersionInfo)t.Value).build_number + ", Game Directory: " + info.Value.GsDemoInfo.Header.GameDir + "\n");
+                                ret += ("\t" + "Game Version: " + ((Bxt.VersionInfo)t.Value).build_number + ", Game Directory: " + gamedir + "\n");
                                 datanode.Nodes.Add(new TreeNode("Version info")
                                 {
                                     ForeColor = Color.PaleVioletRed,
