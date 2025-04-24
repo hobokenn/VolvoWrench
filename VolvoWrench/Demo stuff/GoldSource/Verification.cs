@@ -29,6 +29,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         public Verification()
         {
             InitializeComponent();
+            this.Text = "Verification Scriptless";
             DemopathList = new List<string>();
             this.mrtb.DragDrop += Verification_DragDrop;
             this.mrtb.DragEnter += Verification_DragEnter;
