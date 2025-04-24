@@ -151,6 +151,10 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                     mrtb.AppendText(Path.GetFileName(dem.Key) + " -> " + dem.Value.GsDemoInfo.Header.MapName);
                     mrtb.AppendText("\nBXTData:");
                     mrtb.AppendText("\n" + ParseBxtData(dem));
+                    mrtb.Invalidate();
+                    mrtb.Update();
+                    mrtb.Refresh();
+                    Application.DoEvents();
                 }
             }
         }
@@ -917,8 +921,8 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                     {
                         case Bxt.RuntimeDataType.VERSION_INFO:
                             {
-                                ret +=("\t" + "BXT Version: " + ((((Bxt.VersionInfo)t.Value).bxt_version == bxtVersion) ? "Latest (November 11th 2024)" : ("INVALID=" + ((Bxt.VersionInfo)t.Value).bxt_version)) + "\n");
-                                ret +=("\t" + "Game Version: " + ((Bxt.VersionInfo)t.Value).build_number + ", Game Directory: " + gamedir + "\n");
+                                AppendColored(mrtb, "\t" + "BXT Version: " + ((((Bxt.VersionInfo)t.Value).bxt_version == bxtVersion) ? "Latest (November 11th 2024)" : ("INVALID=" + ((Bxt.VersionInfo)t.Value).bxt_version)) + "\n");
+                                AppendColored(mrtb, "\t" + "Game Version: " + ((Bxt.VersionInfo)t.Value).build_number + ", Game Directory: " + gamedir + "\n");
                                 datanode.Nodes.Add(new TreeNode("Version info")
                                 {
                                     ForeColor = Color.PaleVioletRed,
@@ -934,7 +938,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                             {
                                 foreach (var cvar in ((Bxt.CVarValues)t.Value).CVars.Where(cvar => cvarRules.ContainsKey(cvar.Key.ToUpper())).Where(cvar => cvarRules[cvar.Key.ToUpper()] != cvar.Value.ToUpper()))
                                 {
-                                    ret +=("\t" + "Illegal Cvar: " + cvar.Key + " " + cvar.Value + "\n");
+                                    AppendColored(mrtb, "\t" + "Illegal Cvar: " + cvar.Key + " " + cvar.Value + "\n");
                                 }
                                 var cvarnode = new TreeNode("Cvars [" + ((Bxt.CVarValues)t.Value).CVars.Count + "]")
                                 {
@@ -950,7 +954,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                             {
                                 if (i+1 == info.Value.GsDemoInfo.IncludedBXtData.Count)
                                 {
-                                    ret +=("\t" + "Demo bxt time: " + ((Bxt.Time)t.Value).ToString() + " — Frame: " + i + "\n");
+                                    AppendColored(mrtb, "\t" + "Demo bxt time: " + ((Bxt.Time)t.Value).ToString() + " — Frame: " + i + "\n");
                                 }
                                 datanode.Nodes.Add(new TreeNode("Time: " + ((Bxt.Time)t.Value).ToString())
                                 {
@@ -971,7 +975,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     dm++;
                                 if (command.ToUpper().Contains(";"))
                                 {
-                                    ret +=("\t" + "Possible script: " + command + " — Frame: " + i + "\n");
+                                    AppendColored(mrtb, "\t" + "Possible script: " + command + " — Frame: " + i + "\n");
                                 }
                                 datanode.Nodes.Add(new TreeNode("Bound command: " + command)
                                 {
@@ -991,7 +995,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                             }
                         case Bxt.RuntimeDataType.SCRIPT_EXECUTION:
                             {
-                                ret +=("\t" + "Config execution: " + ((Bxt.ScriptExecution)t.Value).filename + " — Frame: " + i + "\n");
+                                AppendColored(mrtb, "\t" + "Config execution: " + ((Bxt.ScriptExecution)t.Value).filename + " — Frame: " + i + "\n");
                                 //Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\verification cfgs\\");
                                 //File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\verification cfgs\\" + ((Bxt.ScriptExecution)t.Value).filename, ((Bxt.ScriptExecution)t.Value).contents);
                                 datanode.Nodes.Add(new TreeNode("Script: " + ((Bxt.ScriptExecution)t.Value).filename)
@@ -1048,7 +1052,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                   || command.ToUpper().Contains("_CROSS")
                                   || command.ToUpper().Contains("_VIEWMODEL")))
                                 {
-                                    ret +=("\t" + "Disallowed BXT command: " + command + " — Frame: " + i + "\n");
+                                    AppendColored(mrtb, "\t" + "Disallowed BXT command: " + command + " — Frame: " + i + "\n");
                                 }
                                 datanode.Nodes.Add(new TreeNode("Command: " + command)
                                 {
@@ -1078,7 +1082,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                   || command.ToUpper().Contains("CAM")
                                   || command.ToUpper().Contains("JOY"))
                                 {
-                                    ret +=("\t" + "Disallowed: " + command + " — Frame: " + i + "\n");
+                                    AppendColored(mrtb, "\t" + "Disallowed: " + command + " — Frame: " + i + "\n");
                                 }
                                 if ((command.ToUpper().Contains("SV_")
                                   && !command.ToUpper().Contains("AIM"))
@@ -1116,7 +1120,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                         case Bxt.RuntimeDataType.CUSTOM_TRIGGER_COMMAND:
                             {
                                 var trigger = (Bxt.CustomTriggerCommand)t.Value;
-                                ret +=("\t" + $"Custom trigger X1:{trigger.corner_max.X} Y1:{trigger.corner_max.Y} Z1:{trigger.corner_max.Z} X2:{trigger.corner_min.X} Y2:{trigger.corner_min.Y} Z2:{trigger.corner_min.Z}" + " — Frame: " + i + "\n");
+                                AppendColored(mrtb, "\t" + $"Custom trigger X1:{trigger.corner_max.X} Y1:{trigger.corner_max.Y} Z1:{trigger.corner_max.Z} X2:{trigger.corner_min.X} Y2:{trigger.corner_min.Y} Z2:{trigger.corner_min.Z}" + " — Frame: " + i + "\n");
                                 datanode.Nodes.Add(new TreeNode($"Custom trigger X1:{trigger.corner_max.X} Y1:{trigger.corner_max.Y} Z1:{trigger.corner_max.Z} X2:{trigger.corner_min.X} Y2:{trigger.corner_min.Y} Z2:{trigger.corner_min.Z}")
                                 {
                                     ForeColor = Color.Orange,
@@ -1141,7 +1145,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                         case Bxt.RuntimeDataType.SPLIT_MARKER:
                             {
                                 var split = (Bxt.SplitMarker)t.Value;
-                                ret +=("\t" + $"Split trigger X1:{split.corner_max.X} Y1:{split.corner_max.Y} Z1:{split.corner_max.Z} X2:{split.corner_min.X} Y2:{split.corner_min.Y} Z2:{split.corner_min.Z}" + " — Frame: " + i + "\n");
+                                AppendColored(mrtb, "\t" + $"Split trigger X1:{split.corner_max.X} Y1:{split.corner_max.Y} Z1:{split.corner_max.Z} X2:{split.corner_min.X} Y2:{split.corner_min.Y} Z2:{split.corner_min.Z}" + " — Frame: " + i + "\n");
                                 datanode.Nodes.Add(new TreeNode($"Split trigger X1:{split.corner_max.X} Y1:{split.corner_max.Y} Z1:{split.corner_max.Z} X2:{split.corner_min.X} Y2:{split.corner_min.Y} Z2:{split.corner_min.Z}")
                                 {
                                     ForeColor = Color.Orange,
@@ -1184,6 +1188,19 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             var dropfiles = (string[]) e.Data.GetData(DataFormats.FileDrop);
             Verify(dropfiles);
             e.Effect = DragDropEffects.None;
+        }
+
+        private void AppendColored(RichTextBox box, string text, Color color)
+        {
+            box.SelectionStart = box.TextLength;
+            box.SelectionColor = color;
+            box.AppendText(text);
+            box.SelectionColor = box.ForeColor;    // reset
+        }
+
+        private void AppendColored(RichTextBox box, string text)
+        {
+            AppendColored(box, text, box.ForeColor);
         }
     }
 }
