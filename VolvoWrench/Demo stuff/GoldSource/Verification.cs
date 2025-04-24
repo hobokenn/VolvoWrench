@@ -149,8 +149,13 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                         }
                     }
                     mrtb.AppendText(Path.GetFileName(dem.Key) + " -> " + dem.Value.GsDemoInfo.Header.MapName);
-                    mrtb.AppendText("\nBXTData:");
-                    mrtb.AppendText("\n" + ParseBxtData(dem));
+                    mrtb.AppendText("\nBXTData:\n");
+                    ParseBxtData(dem);
+                    mrtb.AppendText("\n");
+                    mrtb.Invalidate();
+                    mrtb.Update();
+                    mrtb.Refresh();
+                    Application.DoEvents();
                 }
             }
         }
@@ -159,9 +164,8 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
         /// Parses the bxt data into treenodes
         /// </summary>
         /// <param name="Infos"></param>
-        public string ParseBxtData(KeyValuePair<string, CrossParseResult> info)
+        public void ParseBxtData(KeyValuePair<string, CrossParseResult> info)
         {
-            string ret = "\n";
             const string bxtVersion = "cbc496b1ba7f6c242a961c33f16d3b5741371dd6-CLEAN based on nov-11-2024";
             var cvarRules = new Dictionary<string, string>()
             {
@@ -1108,7 +1112,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 }
                                 break;
                             }
-                            
                         case Bxt.RuntimeDataType.GAME_END_MARKER:
                             {
                                 datanode.Nodes.Add(new TreeNode("-- GAME END --") { ForeColor = Color.ForestGreen });
@@ -1192,6 +1195,19 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             var dropfiles = (string[]) e.Data.GetData(DataFormats.FileDrop);
             Verify(dropfiles);
             e.Effect = DragDropEffects.None;
+        }
+
+        private void AppendColored(RichTextBox box, string text, Color color)
+        {
+            box.SelectionStart = box.TextLength;
+            box.SelectionColor = color;
+            box.AppendText(text);
+            box.SelectionColor = box.ForeColor;    // reset
+        }
+
+        private void AppendColored(RichTextBox box, string text)
+        {
+            AppendColored(box, text, box.ForeColor);
         }
     }
 }
