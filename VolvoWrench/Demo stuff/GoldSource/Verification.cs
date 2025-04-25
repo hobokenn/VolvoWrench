@@ -1069,7 +1069,23 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 });
                                 if (command.ToUpper().StartsWith("LOAD"))
                                 {
-                                    AppendColored(mrtb, "\t" + command + "\n");
+                                    string loadName = command.Substring(4).ToUpper().Trim();
+                                    if(loadName == "QUICK" || loadName == "HARD" || loadName == "AUTOSAVE")
+                                    {
+                                        AppendColored(mrtb, "\t" + command + "\n");
+                                    }
+                                    else
+                                    {
+                                        AppendColored(mrtb, "\t" + command + "\n", Color.Yellow);
+                                    }
+                                }
+                                if (command.ToUpper().StartsWith("SAVE"))
+                                {
+                                    string saveName = command.Substring(4).ToUpper().Trim();
+                                    if(!(saveName == "QUICK" || saveName == "HARD" || saveName == "AUTOSAVE"))
+                                    {
+                                        AppendColored(mrtb, "\t" + command + " — Frame: " + i + "\n");
+                                    }
                                 }
                                 if (command.ToUpper().Contains("HOST_")
                                   || command.ToUpper().Contains("SK_")
