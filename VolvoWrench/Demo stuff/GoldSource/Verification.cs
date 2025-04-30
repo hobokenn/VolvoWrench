@@ -1194,6 +1194,14 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             box.SelectionColor = box.ForeColor;
         }
 
+        private void clearDemosButton_Click(object sender, EventArgs e)
+        {
+            mrtb.Clear();
+            DemopathList.Clear();
+            Df.Clear();
+            BXTTreeView.Nodes.Clear();
+            mrtb.AppendText("Demos cleared, ready to parse.\n");
+        }
         private void refreshTextBox()
         {
             mrtb.Invalidate();
