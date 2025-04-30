@@ -93,20 +93,14 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         {
             Df.Clear();
             mrtb.Text = $@"Please wait. Parsing demos... 0/{files.Length}";
-            mrtb.Invalidate();
-            mrtb.Update();
-            mrtb.Refresh();
-            Application.DoEvents();
+            refreshTextBox();
             var curr = 0;
             foreach (var dt in files.Where(file => File.Exists(file) && Path.GetExtension(file) == ".dem"))
             {
                 DemopathList.Add(dt);
                 Df.Add(dt, CrossDemoParser.Parse(dt)); //If someone bothers me that its slow make it async.
                 mrtb.Text = $@"Please wait. Parsing demos... {curr++}/{files.Length}";
-                mrtb.Invalidate();
-                mrtb.Update();
-                mrtb.Refresh();
-                Application.DoEvents();
+                refreshTextBox();
             }
             if (Df.Any(x => x.Value.GsDemoInfo.ParsingErrors.Count > 0))
             {
@@ -153,10 +147,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                     mrtb.AppendText("\nBXTData:\n");
                     ParseBxtData(dem);
                     mrtb.AppendText("\n");
-                    mrtb.Invalidate();
-                    mrtb.Update();
-                    mrtb.Refresh();
-                    Application.DoEvents();
+                    refreshTextBox();
                 }
             }
         }
@@ -1203,6 +1194,14 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             box.SelectionColor = (color ?? box.ForeColor);
             box.AppendText(text);
             box.SelectionColor = box.ForeColor;
+        }
+
+        private void refreshTextBox()
+        {
+            mrtb.Invalidate();
+            mrtb.Update();
+            mrtb.Refresh();
+            Application.DoEvents();
         }
     }
 }
