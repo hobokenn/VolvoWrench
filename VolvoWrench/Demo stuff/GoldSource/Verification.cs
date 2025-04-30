@@ -878,14 +878,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 {"SK_ZOMBIE_SOLDIER_HEALTH2", "60"},
                 {"SK_ZOMBIE_SOLDIER_HEALTH3", "120"},
             };
-            foreach (var cvar in (((Bxt.CVarValues)info.Value.GsDemoInfo.IncludedBXtData[0].Objects[1].Value).CVars)) //cvars always located in 1st dataframe 2nd object
-            {
-                if(cvar.Key == "bxt_bhopcap_prediction")    //Only registered in steam versions
-                {
-                    cvarRules["BXT_BHOPCAP"] = "1";
-                    cvarRules.Remove("FPS_OVERRIDE");
-                }
-            }
             if(info.Value.GsDemoInfo.Header.MapName.StartsWith("ba_"))  //blue shift map
             {
                 skillCvarRules["SK_BATTERY1"] = "20";
@@ -928,6 +920,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                             }
                         case Bxt.RuntimeDataType.CVAR_VALUES:
                             {
+                                var cvars = ((Bxt.CVarValues)info.Value.GsDemoInfo.IncludedBXtData[i].Objects[index].Value).CVars;
+                                if (cvars.Any(item  => item .Key == "bxt_bhopcap_prediction")) // only registered for steam
+                                {
+                                    cvarRules["BXT_BHOPCAP"] = "1";
+                                    cvarRules.Remove("FPS_OVERRIDE");
+                                }
                                 foreach (var cvar in ((Bxt.CVarValues)t.Value).CVars.Where(cvar => cvarRules.ContainsKey(cvar.Key.ToUpper())).Where(cvar => cvarRules[cvar.Key.ToUpper()] != cvar.Value.ToUpper()))
                                 {
                                     AppendColored(mrtb, "\t" + "Illegal Cvar: " + cvar.Key + " " + cvar.Value + "\n", Color.Red);
