@@ -1197,17 +1197,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             e.Effect = DragDropEffects.None;
         }
 
-        private void AppendColored(RichTextBox box, string text, Color color)
+        private void AppendColored(RichTextBox box, string text, Color? color = null)
         {
             box.SelectionStart = box.TextLength;
-            box.SelectionColor = color;
+            box.SelectionColor = (color ?? box.ForeColor);
             box.AppendText(text);
-            box.SelectionColor = box.ForeColor;    // reset
-        }
-
-        private void AppendColored(RichTextBox box, string text)
-        {
-            AppendColored(box, text, box.ForeColor);
+            box.SelectionColor = box.ForeColor;
         }
     }
 }
