@@ -39,6 +39,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openDemosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearDemosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.BXTTreeView = new System.Windows.Forms.TreeView();
             this.mrtb = new System.Windows.Forms.RichTextBox();
@@ -82,7 +83,8 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             this.menuStrip1.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.clearDemosToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
@@ -107,6 +109,15 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             this.openDemosToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
             this.openDemosToolStripMenuItem.Text = "Open demos";
             this.openDemosToolStripMenuItem.Click += new System.EventHandler(this.openDemosToolStripMenuItem_Click);
+            //
+            // clearDemosToolStripMenuItem
+            //
+            this.clearDemosToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.clearDemosToolStripMenuItem.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
+            this.clearDemosToolStripMenuItem.Name = "clearDemosToolStripMenuItem";
+            this.clearDemosToolStripMenuItem.Size = new System.Drawing.Size(90, 20);
+            this.clearDemosToolStripMenuItem.Text = "Clear demos";
+            this.clearDemosToolStripMenuItem.Click += new System.EventHandler(this.clearDemosButton_Click);
             // 
             // splitContainer1
             // 
@@ -191,6 +202,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         private MenuStrip menuStrip1;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem openDemosToolStripMenuItem;
+        private ToolStripMenuItem clearDemosToolStripMenuItem;
         private SplitContainer splitContainer1;
         private TreeView BXTTreeView;
         private RichTextBox mrtb;

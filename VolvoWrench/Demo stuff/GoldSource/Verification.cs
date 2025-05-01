@@ -93,20 +93,14 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         {
             Df.Clear();
             mrtb.Text = $@"Please wait. Parsing demos... 0/{files.Length}";
-            mrtb.Invalidate();
-            mrtb.Update();
-            mrtb.Refresh();
-            Application.DoEvents();
+            refreshTextBox();
             var curr = 0;
             foreach (var dt in files.Where(file => File.Exists(file) && Path.GetExtension(file) == ".dem"))
             {
                 DemopathList.Add(dt);
                 Df.Add(dt, CrossDemoParser.Parse(dt)); //If someone bothers me that its slow make it async.
                 mrtb.Text = $@"Please wait. Parsing demos... {curr++}/{files.Length}";
-                mrtb.Invalidate();
-                mrtb.Update();
-                mrtb.Refresh();
-                Application.DoEvents();
+                refreshTextBox();
             }
             if (Df.Any(x => x.Value.GsDemoInfo.ParsingErrors.Count > 0))
             {
@@ -153,10 +147,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                     mrtb.AppendText("\nBXTData:\n");
                     ParseBxtData(dem);
                     mrtb.AppendText("\n");
-                    mrtb.Invalidate();
-                    mrtb.Update();
-                    mrtb.Refresh();
-                    Application.DoEvents();
+                    refreshTextBox();
                 }
             }
         }
@@ -883,14 +874,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 {"SK_ZOMBIE_SOLDIER_HEALTH2", "60"},
                 {"SK_ZOMBIE_SOLDIER_HEALTH3", "120"},
             };
-            foreach (var cvar in (((Bxt.CVarValues)info.Value.GsDemoInfo.IncludedBXtData[0].Objects[1].Value).CVars)) //cvars always located in 1st dataframe 2nd object
-            {
-                if (cvar.Key == "bxt_bhopcap_prediction") //Only registered in steam versions
-                {
-                    cvarRules["BXT_BHOPCAP"] = "1";
-                    cvarRules.Remove("FPS_OVERRIDE");
-                }
-            }
             if (info.Value.GsDemoInfo.Header.MapName.StartsWith("ba_"))  //blue shift map
             {
                 skillCvarRules["SK_BATTERY2"] = "20";
@@ -933,6 +916,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                             }
                         case Bxt.RuntimeDataType.CVAR_VALUES:
                             {
+                                var cvars = ((Bxt.CVarValues)info.Value.GsDemoInfo.IncludedBXtData[i].Objects[index].Value).CVars;
+                                if (cvars.Any(item => item.Key == "bxt_bhopcap_prediction")) // only registered for steam
+                                {
+                                    cvarRules["BXT_BHOPCAP"] = "1";
+                                    cvarRules.Remove("FPS_OVERRIDE");
+                                }
                                 foreach (var cvar in ((Bxt.CVarValues)t.Value).CVars.Where(cvar => cvarRules.ContainsKey(cvar.Key.ToUpper())).Where(cvar => cvarRules[cvar.Key.ToUpper()] != cvar.Value.ToUpper()))
                                 {
                                     AppendColored(mrtb, "\t" + "Illegal Cvar: " + cvar.Key + " " + cvar.Value + "\n", Color.Red);
@@ -1213,17 +1202,28 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             e.Effect = DragDropEffects.None;
         }
 
-        private void AppendColored(RichTextBox box, string text, Color color)
+        private void AppendColored(RichTextBox box, string text, Color? color = null)
         {
             box.SelectionStart = box.TextLength;
-            box.SelectionColor = color;
+            box.SelectionColor = (color ?? box.ForeColor);
             box.AppendText(text);
-            box.SelectionColor = box.ForeColor;    // reset
+            box.SelectionColor = box.ForeColor;
         }
 
-        private void AppendColored(RichTextBox box, string text)
+        private void clearDemosButton_Click(object sender, EventArgs e)
         {
-            AppendColored(box, text, box.ForeColor);
+            mrtb.Clear();
+            DemopathList.Clear();
+            Df.Clear();
+            BXTTreeView.Nodes.Clear();
+            mrtb.AppendText("Demos cleared, ready to parse.\n");
+        }
+        private void refreshTextBox()
+        {
+            mrtb.Invalidate();
+            mrtb.Update();
+            mrtb.Refresh();
+            Application.DoEvents();
         }
     }
 }
