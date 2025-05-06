@@ -105,14 +105,12 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         {
             Df.Clear();
             mrtb.Text = $@"Please wait. Parsing demos... 0/{files.Length}";
-            refreshTextBox();
             var curr = 0;
             foreach (var dt in files.Where(file => File.Exists(file) && Path.GetExtension(file) == ".dem"))
             {
                 DemopathList.Add(dt);
                 Df.Add(dt, CrossDemoParser.Parse(dt)); //If someone bothers me that its slow make it async.
                 mrtb.Text = $@"Please wait. Parsing demos... {curr++}/{files.Length}";
-                refreshTextBox();
             }
             if (Df.Any(x => x.Value.GsDemoInfo.ParsingErrors.Count > 0))
             {
@@ -145,6 +143,9 @@ Total time of the demos:    {Df.Sum(x => x.Value.GsDemoInfo.DirectoryEntries.Sum
 Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo.DirectoryEntries.Sum(y => y.TrackTime))).ToString("g")}" + "\n\n");
 
                 textBuffer.Append("Demo cheat check:" + "\n");
+                BXTTreeView.BeginUpdate();  //prevent UI tree updates during processing
+                var cur = 0;
+                mrtb.Text = $@"Please wait. Analyzing demos... 0/{files.Length}";
                 foreach (var dem in Df)
                 {
                     if (dem.Value.GsDemoInfo.Cheats.Count > 0)
@@ -159,8 +160,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                     textBuffer.Append("\nBXTData:\n");
                     ParseBxtData(dem);
                     textBuffer.Append("\n");
-                    refreshTextBox();
+                    mrtb.Text = $@"Please wait. Analyzing demos... {cur++}/{files.Length}";
                 }
+                mrtb.Clear();
+                textBuffer.AppendToRichTextBox(mrtb);
+                textBuffer.Clear();
+                BXTTreeView.EndUpdate();    //draw treeview after processing
             }
         }
 
@@ -1183,9 +1188,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 }
                 demonode.Nodes.Add(datanode);
             }
-            mrtb.Clear();
-            textBuffer.AppendToRichTextBox(mrtb);
-            textBuffer.Clear();
             BXTTreeView.Nodes.Add(demonode);
         }
 
@@ -1208,13 +1210,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             Df.Clear();
             BXTTreeView.Nodes.Clear();
             mrtb.AppendText("Demos cleared, ready to parse.\n");
-        }
-        private void refreshTextBox()
-        {
-            mrtb.Invalidate();
-            mrtb.Update();
-            mrtb.Refresh();
-            Application.DoEvents();
         }
     }
 }
