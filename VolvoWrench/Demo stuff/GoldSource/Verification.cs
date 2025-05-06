@@ -1205,11 +1205,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
 
         private void clearDemosButton_Click(object sender, EventArgs e)
         {
-            mrtb.Clear();
+            mrtb.Text = "Deleting bxt tree nodes, this may take a while...\n";
             DemopathList.Clear();
-            Df.Clear();
+            BXTTreeView.BeginUpdate();
             BXTTreeView.Nodes.Clear();
-            mrtb.AppendText("Demos cleared, ready to parse.\n");
+            BXTTreeView.EndUpdate();
+            mrtb.Text = "Demos cleared, ready to parse\n";
         }
     }
 }
