@@ -145,6 +145,7 @@
     <Compile Include="Demo stuff\BinaryReaderExtension.cs" />
     <Compile Include="Demo stuff\DemoInfo.cs" />
     <Compile Include="Demo stuff\GoldSource\BXT.cs" />
+    <Compile Include="Demo stuff\GoldSource\ColoredTextBuffer.cs" />
     <Compile Include="Demo stuff\GoldSource\frmFrameView.cs">
       <SubType>Form</SubType>
     </Compile>
