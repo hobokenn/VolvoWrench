@@ -24,6 +24,12 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         public List<string> DemopathList;
 
         /// <summary>
+        ///     Static color definitions
+        /// </summary>
+        public static readonly Color IllegalColor = Color.LightCoral;
+        public static readonly Color WarningColor = Color.Yellow;
+
+        /// <summary>
         ///     Default constructor
         /// </summary>
         public Verification()
@@ -924,7 +930,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 }
                                 foreach (var cvar in ((Bxt.CVarValues)t.Value).CVars.Where(cvar => cvarRules.ContainsKey(cvar.Key.ToUpper())).Where(cvar => cvarRules[cvar.Key.ToUpper()] != cvar.Value.ToUpper()))
                                 {
-                                    AppendColored(mrtb, "\t" + "Illegal Cvar: " + cvar.Key + " " + cvar.Value + "\n", Color.Red);
+                                    AppendColored(mrtb, "\t" + "Illegal Cvar: " + cvar.Key + " " + cvar.Value + "\n", IllegalColor)
                                 }
                                 var cvarnode = new TreeNode("Cvars [" + ((Bxt.CVarValues)t.Value).CVars.Count + "]")
                                 {
@@ -1028,7 +1034,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 //| (((Bxt.CommandExecution)t.Value).command.ToUpper().ToUpper().Contains("CROSS"))
                                 //| (((Bxt.CommandExecution)t.Value).command.ToUpper().ToUpper().Contains("VIEWMODEL"))))
                                 //{
-                                //    AppendColored(mrtb, "\t" + "Disallowed bxt command: " + ((Bxt.CommandExecution)t.Value).command + " Frame: " + i + "\n", Color.Red);
+                                //    AppendColored(mrtb, "\t" + "Disallowed bxt command: " + ((Bxt.CommandExecution)t.Value).command + " Frame: " + i + "\n", IllegalColor)
                                 //}
 
                                 string command = ((Bxt.CommandExecution)t.Value).command.Trim();
@@ -1050,7 +1056,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     || command.ToUpper().Contains("_CROSS")
                                     || command.ToUpper().Contains("_VIEWMODEL")))
                                 {
-                                    AppendColored(mrtb, "\t" + "Disallowed bxt command: " + command + " — Frame: " + i + "\n", Color.Red);
+                                    AppendColored(mrtb, "\t" + "Disallowed bxt command: " + command + " — Frame: " + i + "\n", IllegalColor)
                                 }
                                 datanode.Nodes.Add(new TreeNode("Command: " + command)
                                 {
@@ -1065,7 +1071,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     }
                                     else
                                     {
-                                        AppendColored(mrtb, "\t" + command + "\n", Color.Yellow);
+                                        AppendColored(mrtb, "\t" + command + "\n", WarningColor)
                                     }
                                 }
                                 if (command.ToUpper().StartsWith("SAVE"))
@@ -1095,7 +1101,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                   || command.ToUpper().Contains("CAM")
                                   || command.ToUpper().Contains("JOY"))
                                 {
-                                    AppendColored(mrtb, "\t" + "Disallowed: " + command + " — Frame: " + i + "\n", Color.Red);
+                                    AppendColored(mrtb, "\t" + "Disallowed: " + command + " — Frame: " + i + "\n", IllegalColor)
                                 }
                                 if ((command.ToUpper().Contains("SV_")
                                    && !command.ToUpper().Contains("AIM"))
@@ -1146,7 +1152,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                             {
                                 if (((Bxt.Edicts)t.Value).edicts > 900)
                                 {
-                                    AppendColored(mrtb, "\t" + "Max edicts value is higher than 900: " + ((Bxt.Edicts)t.Value).edicts + "\n", Color.Red);
+                                    AppendColored(mrtb, "\t" + "Max edicts value is higher than 900: " + ((Bxt.Edicts)t.Value).edicts + "\n", IllegalColor)
                                 }
                                 datanode.Nodes.Add(new TreeNode("Max edicts: " + ((Bxt.Edicts)t.Value).edicts) { ForeColor = Color.Violet });
                                 break;
