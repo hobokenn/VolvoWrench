@@ -161,6 +161,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                     ParseBxtData(dem);
                     textBuffer.Append("\n");
                     mrtb.Text = $@"Please wait. Analyzing demos... {cur++}/{files.Length}";
+                    Application.DoEvents();
                 }
                 mrtb.Clear();
                 textBuffer.AppendToRichTextBox(mrtb);
