@@ -30,6 +30,11 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         public static readonly Color WarningColor = Color.Yellow;
 
         /// <summary>
+        ///     Buffer holds strings to be printed
+        /// </summary>
+        private ColoredTextBuffer textBuffer;
+
+        /// <summary>
         ///     Default constructor
         /// </summary>
         public Verification()
@@ -41,6 +46,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             this.mrtb.DragEnter += Verification_DragEnter;
             this.mrtb.AllowDrop = true;
             AllowDrop = true;
+            textBuffer = new ColoredTextBuffer(this.mrtb.ForeColor);
         }
 
         private void openDemosToolStripMenuItem_Click(object sender, EventArgs e)
@@ -124,10 +130,10 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             else
             {
                 mrtb.Text = "";
-                mrtb.AppendText("" + "\n");
-                mrtb.AppendText("Parsed demos. Results:" + "\n");
-                mrtb.AppendText("General stats:" + "\n");
-                mrtb.AppendText($@"
+                textBuffer.Append("" + "\n");
+                textBuffer.Append("Parsed demos. Results:" + "\n");
+                textBuffer.Append("General stats:" + "\n");
+                textBuffer.Append($@"
 Highest FPS:                {(1/Df.Select(x => x.Value).ToList().Min(y => y.GsDemoInfo.AditionalStats.FrametimeMin)).ToString("N2")}
 Lowest FPS:                 {(1/Df.Select(x => x.Value).ToList().Max(y => y.GsDemoInfo.AditionalStats.FrametimeMax)).ToString("N2")}
 Average FPS:                {(Df.Select(z => z.Value).ToList().Average(k => k.GsDemoInfo.AditionalStats.Count/k.GsDemoInfo.AditionalStats.FrametimeSum)).ToString("N2")}
@@ -138,21 +144,21 @@ Average msec:               {(Df.Select(x => x.Value).ToList().Average(y => y.Gs
 Total time of the demos:    {Df.Sum(x => x.Value.GsDemoInfo.DirectoryEntries.Sum(y => y.TrackTime))}s
 Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo.DirectoryEntries.Sum(y => y.TrackTime))).ToString("g")}" + "\n\n");
 
-                mrtb.AppendText("Demo cheat check:" + "\n");
+                textBuffer.Append("Demo cheat check:" + "\n");
                 foreach (var dem in Df)
                 {
                     if (dem.Value.GsDemoInfo.Cheats.Count > 0)
                     {
-                        mrtb.AppendText("Possible cheats:\n");
+                        textBuffer.Append("Possible cheats:\n");
                         foreach (var cheat in dem.Value.GsDemoInfo.Cheats.Distinct())
                         {
-                            mrtb.AppendText("\t" + cheat + "\n");
+                            textBuffer.Append("\t" + cheat + "\n");
                         }
                     }
-                    mrtb.AppendText(Path.GetFileName(dem.Key) + " -> " + dem.Value.GsDemoInfo.Header.MapName);
-                    mrtb.AppendText("\nBXTData:\n");
+                    textBuffer.Append(Path.GetFileName(dem.Key) + " -> " + dem.Value.GsDemoInfo.Header.MapName);
+                    textBuffer.Append("\nBXTData:\n");
                     ParseBxtData(dem);
-                    mrtb.AppendText("\n");
+                    textBuffer.Append("\n");
                     refreshTextBox();
                 }
             }
@@ -907,8 +913,8 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                         case Bxt.RuntimeDataType.VERSION_INFO:
                             {
 
-                                AppendColored(mrtb, "\t" + "BXT Version: " + ((((Bxt.VersionInfo)t.Value).bxt_version == bxtVersion) ? "Latest (November 11th 2024)" : ("INVALID=" + ((Bxt.VersionInfo)t.Value).bxt_version)) + "\n");
-                                AppendColored(mrtb, "\t" + "Game Version: " + ((Bxt.VersionInfo)t.Value).build_number + ", Game Directory: " + gamedir + "\n");
+                                textBuffer.Append("\t" + "BXT Version: " + ((((Bxt.VersionInfo)t.Value).bxt_version == bxtVersion) ? "Latest (November 11th 2024)" : ("INVALID=" + ((Bxt.VersionInfo)t.Value).bxt_version)) + "\n");
+                                textBuffer.Append("\t" + "Game Version: " + ((Bxt.VersionInfo)t.Value).build_number + ", Game Directory: " + gamedir + "\n");
                                 datanode.Nodes.Add(new TreeNode("Version info")
                                 {
                                     ForeColor = Color.PaleVioletRed,
@@ -930,7 +936,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 }
                                 foreach (var cvar in ((Bxt.CVarValues)t.Value).CVars.Where(cvar => cvarRules.ContainsKey(cvar.Key.ToUpper())).Where(cvar => cvarRules[cvar.Key.ToUpper()] != cvar.Value.ToUpper()))
                                 {
-                                    AppendColored(mrtb, "\t" + "Illegal Cvar: " + cvar.Key + " " + cvar.Value + "\n", IllegalColor)
+                                    textBuffer.Append("\t" + "Illegal Cvar: " + cvar.Key + " " + cvar.Value + "\n", IllegalColor);
                                 }
                                 var cvarnode = new TreeNode("Cvars [" + ((Bxt.CVarValues)t.Value).CVars.Count + "]")
                                 {
@@ -946,7 +952,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                             {
                                 if (i+1 == info.Value.GsDemoInfo.IncludedBXtData.Count)
                                 {
-                                    AppendColored(mrtb, "\t" + "Demo bxt time: " + ((Bxt.Time)t.Value).ToString() + " — Frame: " + i + "\n");
+                                    textBuffer.Append("\t" + "Demo bxt time: " + ((Bxt.Time)t.Value).ToString() + " — Frame: " + i + "\n");
                                 }
                                 datanode.Nodes.Add(new TreeNode("Time: " + ((Bxt.Time)t.Value).ToString())
                                 {
@@ -959,7 +965,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 string command = ((Bxt.BoundCommand)t.Value).command.Trim();
                                 if (command.ToUpper().Contains(";"))
                                 {
-                                    AppendColored(mrtb, "\t" + "Possible script: " + command + " — Frame: " + i + "\n");
+                                    textBuffer.Append("\t" + "Possible script: " + command + " — Frame: " + i + "\n");
                                 }
                                 datanode.Nodes.Add(new TreeNode("Bound command: " + command)
                                 {
@@ -976,7 +982,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     || aliasCommand.ToUpper().Contains("+FORWARD")
                                     || aliasCommand.ToUpper().Contains("+BACK"))
                                 {
-                                    AppendColored(mrtb, "\t" + "Movement command in alias [" + ((Bxt.AliasExpansion)t.Value).name + "]: " + aliasCommand + " — Frame: " + i + "\n");
+                                    textBuffer.Append("\t" + "Movement command in alias [" + ((Bxt.AliasExpansion)t.Value).name + "]: " + aliasCommand + " — Frame: " + i + "\n");
                                 }
                                 datanode.Nodes.Add(new TreeNode("Alias [" + ((Bxt.AliasExpansion)t.Value).name + "]: " + aliasCommand) { ForeColor = Color.LightCyan });
                                 break;
@@ -988,7 +994,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 // that 2nd config will get skipped and stuffed to the end, thus breaking the order of execution.
                                 // case in point -- https://www.speedrun.com/hl1/runs/zqd4kv5m
 
-                                AppendColored(mrtb, "\t" + "Config execution: " + ((Bxt.ScriptExecution)t.Value).filename + " — Frame: " + i + "\n");
+                                textBuffer.Append("\t" + "Config execution: " + ((Bxt.ScriptExecution)t.Value).filename + " — Frame: " + i + "\n");
 
                                 // TODO: If someone has their scripts in a sub directory and half-life's cmd_exec_f() gets called
                                 // with e.g. "exec scripts/gauss.cfg", File.WriteAllText() will throw an IO exception.
@@ -1034,7 +1040,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 //| (((Bxt.CommandExecution)t.Value).command.ToUpper().ToUpper().Contains("CROSS"))
                                 //| (((Bxt.CommandExecution)t.Value).command.ToUpper().ToUpper().Contains("VIEWMODEL"))))
                                 //{
-                                //    AppendColored(mrtb, "\t" + "Disallowed bxt command: " + ((Bxt.CommandExecution)t.Value).command + " Frame: " + i + "\n", IllegalColor)
+                                //    textBuffer.Append("\t" + "Disallowed bxt command: " + ((Bxt.CommandExecution)t.Value).command + " Frame: " + i + "\n", IllegalColor);
                                 //}
 
                                 string command = ((Bxt.CommandExecution)t.Value).command.Trim();
@@ -1056,7 +1062,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     || command.ToUpper().Contains("_CROSS")
                                     || command.ToUpper().Contains("_VIEWMODEL")))
                                 {
-                                    AppendColored(mrtb, "\t" + "Disallowed bxt command: " + command + " — Frame: " + i + "\n", IllegalColor)
+                                    textBuffer.Append("\t" + "Disallowed bxt command: " + command + " — Frame: " + i + "\n", IllegalColor);
                                 }
                                 datanode.Nodes.Add(new TreeNode("Command: " + command)
                                 {
@@ -1067,11 +1073,11 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     string loadName = command.Substring(4).ToUpper().Trim();
                                     if(loadName == "QUICK" || loadName == "HARD" || loadName == "AUTOSAVE")
                                     {
-                                        AppendColored(mrtb, "\t" + command + "\n");
+                                        textBuffer.Append("\t" + command + "\n");
                                     }
                                     else
                                     {
-                                        AppendColored(mrtb, "\t" + command + "\n", WarningColor)
+                                        textBuffer.Append("\t" + command + "\n", WarningColor);
                                     }
                                 }
                                 if (command.ToUpper().StartsWith("SAVE"))
@@ -1079,7 +1085,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     string saveName = command.Substring(4).ToUpper().Trim();
                                     if(!(saveName == "QUICK" || saveName == "HARD" || saveName == "AUTOSAVE"))
                                     {
-                                        AppendColored(mrtb, "\t" + command + " — Frame: " + i + "\n");
+                                        textBuffer.Append("\t" + command + " — Frame: " + i + "\n");
                                     }
                                 }
                                 if (command.ToUpper().Contains("HOST_")
@@ -1101,7 +1107,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                   || command.ToUpper().Contains("CAM")
                                   || command.ToUpper().Contains("JOY"))
                                 {
-                                    AppendColored(mrtb, "\t" + "Disallowed: " + command + " — Frame: " + i + "\n", IllegalColor)
+                                    textBuffer.Append("\t" + "Disallowed: " + command + " — Frame: " + i + "\n", IllegalColor);
                                 }
                                 if ((command.ToUpper().Contains("SV_")
                                    && !command.ToUpper().Contains("AIM"))
@@ -1121,7 +1127,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
 
                                    || (command.ToUpper().StartsWith("STAT")))
                                 {
-                                    AppendColored(mrtb, "\t" + "Probably disallowed ¯\\_(ツ)_/¯: " + command + " — Frame: " + i + "\n");
+                                    textBuffer.Append("\t" + "Probably disallowed ¯\\_(ツ)_/¯: " + command + " — Frame: " + i + "\n");
                                 }
                                 break;
                             }
@@ -1140,7 +1146,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                         case Bxt.RuntimeDataType.CUSTOM_TRIGGER_COMMAND:
                             {
                                 var trigger = (Bxt.CustomTriggerCommand)t.Value;
-                                AppendColored(mrtb, "\t" + $"Custom trigger X1:{trigger.corner_max.X} Y1:{trigger.corner_max.Y} Z1:{trigger.corner_max.Z} X2:{trigger.corner_min.X} Y2:{trigger.corner_min.Y} Z2:{trigger.corner_min.Z}" + " Frame: " + i + "\n");
+                                textBuffer.Append("\t" + $"Custom trigger X1:{trigger.corner_max.X} Y1:{trigger.corner_max.Y} Z1:{trigger.corner_max.Z} X2:{trigger.corner_min.X} Y2:{trigger.corner_min.Y} Z2:{trigger.corner_min.Z}" + " Frame: " + i + "\n");
                                 datanode.Nodes.Add(new TreeNode($"Custom trigger X1:{trigger.corner_max.X} Y1:{trigger.corner_max.Y} Z1:{trigger.corner_max.Z} X2:{trigger.corner_min.X} Y2:{trigger.corner_min.Y} Z2:{trigger.corner_min.Z}")
                                 {
                                     ForeColor = Color.Orange,
@@ -1152,7 +1158,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                             {
                                 if (((Bxt.Edicts)t.Value).edicts > 900)
                                 {
-                                    AppendColored(mrtb, "\t" + "Max edicts value is higher than 900: " + ((Bxt.Edicts)t.Value).edicts + "\n", IllegalColor)
+                                    textBuffer.Append("\t" + "Max edicts value is higher than 900: " + ((Bxt.Edicts)t.Value).edicts + "\n", IllegalColor);
                                 }
                                 datanode.Nodes.Add(new TreeNode("Max edicts: " + ((Bxt.Edicts)t.Value).edicts) { ForeColor = Color.Violet });
                                 break;
@@ -1165,7 +1171,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                         case Bxt.RuntimeDataType.SPLIT_MARKER:
                             {
                                 var split = (Bxt.SplitMarker)t.Value;
-                                AppendColored(mrtb, "\t" + $"Split trigger X1:{split.corner_max.X} Y1:{split.corner_max.Y} Z1:{split.corner_max.Z} X2:{split.corner_min.X} Y2:{split.corner_min.Y} Z2:{split.corner_min.Z}" + " Frame: " + i + "\n");
+                                textBuffer.Append("\t" + $"Split trigger X1:{split.corner_max.X} Y1:{split.corner_max.Y} Z1:{split.corner_max.Z} X2:{split.corner_min.X} Y2:{split.corner_min.Y} Z2:{split.corner_min.Z}" + " Frame: " + i + "\n");
                                 datanode.Nodes.Add(new TreeNode($"Split trigger X1:{split.corner_max.X} Y1:{split.corner_max.Y} Z1:{split.corner_max.Z} X2:{split.corner_min.X} Y2:{split.corner_min.Y} Z2:{split.corner_min.Z}")
                                 {
                                     ForeColor = Color.Orange,
@@ -1179,7 +1185,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 bool bigMap = (bxtFlags & 1) != 0;
                                 if (bigMap)
                                 {
-                                    AppendColored(mrtb, "\tThis runner has used bxt_enable_big_map and didn't restart the game before the run. This command is not intended for RTA leaderboard runs.\n");
+                                    textBuffer.Append("\tThis runner has used bxt_enable_big_map and didn't restart the game before the run. This command is not intended for RTA leaderboard runs.\n");
                                 }
                                 datanode.Nodes.Add(new TreeNode("BXT Flags: " + bxtFlags) { ForeColor = Color.LightSalmon });
                                 break;
@@ -1206,14 +1212,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             var dropfiles = (string[]) e.Data.GetData(DataFormats.FileDrop);
             Verify(dropfiles);
             e.Effect = DragDropEffects.None;
-        }
-
-        private void AppendColored(RichTextBox box, string text, Color? color = null)
-        {
-            box.SelectionStart = box.TextLength;
-            box.SelectionColor = (color ?? box.ForeColor);
-            box.AppendText(text);
-            box.SelectionColor = box.ForeColor;
         }
 
         private void clearDemosButton_Click(object sender, EventArgs e)
