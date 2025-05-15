@@ -981,16 +981,32 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                             }
                         case Bxt.RuntimeDataType.ALIAS_EXPANSION:
                             {
-                                string aliasCommand = ((Bxt.AliasExpansion)t.Value).command.Trim();
-                                if (aliasCommand.ToUpper().Contains("+LEFT")
-                                    || aliasCommand.ToUpper().Contains("+RIGHT")
-                                    || aliasCommand.ToUpper().Contains("+MOVE")
-                                    || aliasCommand.ToUpper().Contains("+FORWARD")
-                                    || aliasCommand.ToUpper().Contains("+BACK"))
+                                var moveCmds = new HashSet<string>(StringComparer.OrdinalIgnoreCase) // case insensitive movement commands
                                 {
-                                    textBuffer.Append("\t" + "Movement command in alias [" + ((Bxt.AliasExpansion)t.Value).name + "]: " + aliasCommand + " — Frame: " + i + "\n");
+                                    "+left", "+right", "+forward", "+back", "+moveright", "+moveleft"
+                                };
+
+                                var alias = (Bxt.AliasExpansion)t.Value;
+                                string aliasTxt = alias.command.Trim();
+                                if (moveCmds.Any(cmd => aliasTxt.IndexOf(cmd, StringComparison.OrdinalIgnoreCase) >= 0))
+                                {
+                                    string[] commands = aliasTxt.Split(';');
+                                    textBuffer.Append("\t" + "Movement command in alias [" + alias.name + "]: ");
+
+                                    foreach (var cmd in commands)
+                                    {
+                                        string trimmedCmd = cmd.Trim();
+                                        bool containsMove = moveCmds.Any(mc =>
+                                            trimmedCmd.IndexOf(mc, StringComparison.OrdinalIgnoreCase) >= 0);
+
+                                        textBuffer.Append(trimmedCmd, containsMove ? WarningColor : mrtb.ForeColor);
+                                        textBuffer.Append("; ", mrtb.ForeColor);
+                                    }
+
+                                    textBuffer.Append("— Frame: " + i + "\n");
                                 }
-                                datanode.Nodes.Add(new TreeNode("Alias [" + ((Bxt.AliasExpansion)t.Value).name + "]: " + aliasCommand) { ForeColor = Color.LightCyan });
+
+                                datanode.Nodes.Add(new TreeNode("Alias [" + alias.name + "]: " + aliasTxt) { ForeColor = Color.LightCyan });
                                 break;
                             }
                         case Bxt.RuntimeDataType.SCRIPT_EXECUTION:
@@ -1052,24 +1068,24 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 string command = ((Bxt.CommandExecution)t.Value).command.Trim();
 
                                 if (command.ToUpper().Contains("BXT")
-                                    && !(command.ToUpper().Contains("_APPEND")
-                                    || command.ToUpper().Contains("_HUD_TIMER")
-                                    || command.ToUpper().Contains("_HUD_COLOR")
-                                    || command.ToUpper().Contains("_HUD_JUMPSPEED")
-                                    || command.ToUpper().Contains("_HUD_SPEEDOMETER")
-                                    || command.ToUpper().Contains("_HUD_VIEWANGLES")
-                                    || command.ToUpper().Contains("_HUD_INCORRECT_FPS")
-                                    || command.ToUpper().Contains("_HUD_GAME")
-                                    || command.ToUpper().Contains("_DISABLE_NIGHTVISION_SPRITE")
-                                    || command.ToUpper().Contains("_DISABLE_AUTOSAVE")
-                                    || command.ToUpper().Contains("_DUCKTAP")
-                                    || command.ToUpper().Contains("_AUTOJUMP")
-                                    || command.ToUpper().Contains("_JUMPBUG")
-                                    || command.ToUpper().Contains("_CROSS")
-                                    || command.ToUpper().Contains("_VIEWMODEL")))
+                                        && !(command.ToUpper().Contains("_APPEND")
+                                        || command.ToUpper().Contains("_HUD_TIMER")
+                                        || command.ToUpper().Contains("_HUD_COLOR")
+                                        || command.ToUpper().Contains("_HUD_JUMPSPEED")
+                                        || command.ToUpper().Contains("_HUD_SPEEDOMETER")
+                                        || command.ToUpper().Contains("_HUD_VIEWANGLES")
+                                        || command.ToUpper().Contains("_HUD_INCORRECT_FPS")
+                                        || command.ToUpper().Contains("_HUD_GAME")
+                                        || command.ToUpper().Contains("_DISABLE_NIGHTVISION_SPRITE")
+                                        || command.ToUpper().Contains("_DISABLE_AUTOSAVE")
+                                        || command.ToUpper().Contains("_DUCKTAP")
+                                        || command.ToUpper().Contains("_AUTOJUMP")
+                                        || command.ToUpper().Contains("_JUMPBUG")
+                                        || command.ToUpper().Contains("_CROSS")
+                                        || command.ToUpper().Contains("_VIEWMODEL")))
                                 {
                                     textBuffer.Append("\t" + "Disallowed bxt command: " + command + " — Frame: " + i + "\n", IllegalColor);
-                                }
+                                }      
                                 datanode.Nodes.Add(new TreeNode("Command: " + command)
                                 {
                                     ForeColor = Color.LightGreen
