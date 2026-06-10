@@ -2165,6 +2165,10 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                         case Bxt.RuntimeDataType.COMMAND_EXECUTION:
                         {
                             string command = ((Bxt.CommandExecution)t.Value).command.Trim();
+                            if (command.ToUpper().StartsWith("BIND") || command.ToUpper().StartsWith("ALIAS"))
+                            {
+                                break;  // Creating any binds/aliases are legal. Check legality during expansion/execution
+                            }
                             //autojump detection scriptless
                             if (isScriptlessMode)
                             {
