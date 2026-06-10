@@ -2253,6 +2253,21 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     textBuffer.Append("\t" + command + "\n", WarningColor);
                                 }
                             }
+                            if (command.ToUpper().Contains("CUST_"))
+                            {
+                                var allowedCust = new HashSet<string>
+                                {
+                                    "CUST_11", "CUST_12", "CUST_13", "CUST_14", "CUST_15",
+                                    "CUST_21", "CUST_22", "CUST_23", "CUST_24", "CUST_25",
+                                    "CUST_31", "CUST_32", "CUST_33", "CUST_34", "CUST_35",
+                                    "CUST_41", "CUST_42", "CUST_43", "CUST_44", "CUST_45"
+                                };
+
+                                if (!allowedCust.Any(c => command.ToUpper().Contains(c)))
+                                {
+                                    textBuffer.Append("\t" + "cust value out of range: " + command + " — Frame: " + i + "\n", IllegalColor);
+                                }
+                            }
                             if (!command.ToUpper().StartsWith("REPORT_TO_DEMO") &&
                                    ( command.ToUpper().Contains("HOST_")
                                     || command.ToUpper().Contains("SK_")
