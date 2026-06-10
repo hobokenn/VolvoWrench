@@ -2000,6 +2000,8 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             }
 
             var demonode = new TreeNode(Path.GetFileName(info.Key)) { ForeColor = Color.LightCoral };
+            bool gameEndReported = false;
+            
             for (int i = 0; i < info.Value.GsDemoInfo.IncludedBXtData.Count; i++)
             {
                 int jp = 0, jm = 0, dp = 0, dm = 0;
@@ -2263,6 +2265,11 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
 
                         case Bxt.RuntimeDataType.GAME_END_MARKER:
                             {
+                                if (!gameEndReported)
+                                {
+                                    textBuffer.Append("\tGAME END — Frame: " + i + "\n", Color.ForestGreen);
+                                    gameEndReported = true;
+                                }
                                 datanode.Nodes.Add(new TreeNode("-- GAME END --") { ForeColor = Color.ForestGreen });
                                 break;
                             }
