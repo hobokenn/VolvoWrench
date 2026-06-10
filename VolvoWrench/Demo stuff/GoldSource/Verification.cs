@@ -1267,8 +1267,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 {"_BXT_SAVE_RUNTIME_DATA_IN_DEMOS", "1"},
                 {"_BXT_TASLOG", "0"},
                 {"BGMBUFFER", "4096"},
-                {"BXT_AUTOJUMP", "0"},
-                {"BXT_AUTOJUMP_PREDICTION", "0"},
                 {"BXT_BHOPCAP", "0"},
                 {"BXT_COLLISION_DEPTH_MAP", "0"},
                 {"BXT_DISABLE_BRUSH_ENTITIES", "0"},
@@ -1377,9 +1375,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 {"CL_MOVESPEEDKEY", "0.3"},
                 {"CL_NEEDINSTANCED", "0"},
                 {"CL_NOSMOOTH", "0"},
-                {"CL_PITCHDOWN", "89"},
                 {"CL_PITCHSPEED", "225"},
-                {"CL_PITCHUP", "89"},
                 {"CL_RULER_ENABLE", "ほぼ"},
                 {"CL_SHOWNET", "0"},
                 {"CL_SIDESPEED", "400"},
@@ -1540,6 +1536,15 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 {"SYS_TICRATE", "100.0"},
                 {"VID_D3D", "0"}
             };
+
+            // Add scriptless-specific cvars only in scriptless mode
+            if (isScriptlessMode)
+            {
+                cvarRules.Add("BXT_AUTOJUMP", "0");
+                cvarRules.Add("BXT_AUTOJUMP_PREDICTION", "0");
+                cvarRules.Add("CL_PITCHDOWN", "89");
+                cvarRules.Add("CL_PITCHUP", "89");
+            }
 
             var skillCvarRules = new Dictionary<string, string>()
             {
