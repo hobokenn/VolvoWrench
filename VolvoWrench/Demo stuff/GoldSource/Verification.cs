@@ -44,6 +44,11 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         private Dictionary<string, List<(string, string)>> MonsterTypeKillByMap = new Dictionary<string, List<(string, string)>>();
 
         /// <summary>
+        ///     Toggle between Scriptless and Scripted modes
+        /// </summary>
+        private bool isScriptlessMode = true;
+
+        /// <summary>
         ///     Default constructor
         /// </summary>
         public Verification()
@@ -2342,6 +2347,13 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             BXTTreeView.Nodes.Clear();
             BXTTreeView.EndUpdate();
             mrtb.Text = "Demos cleared, ready to parse\n";
+        }
+
+        private void toggleModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            isScriptlessMode = !isScriptlessMode;
+            toggleModeToolStripMenuItem.Text = isScriptlessMode ? "Scriptless" : "Scripted";
+            this.Text = isScriptlessMode ? "Verification Scriptless" : "Verification Scripted";
         }
     }
 }
