@@ -2202,7 +2202,11 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 }
                             }
 
-                            // BXT command validation - clean whitelist approach
+                            datanode.Nodes.Add(new TreeNode("Command: " + command)
+                            {
+                                ForeColor = Color.LightGreen
+                            });
+
                             if (command.ToUpper().Contains("BXT"))
                             {
                                 var allowedBxtCommands = new HashSet<string>
@@ -2218,10 +2222,10 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     "_DISABLE_AUTOSAVE",
                                     "_CROSS",
                                     "_VIEWMODEL",
-                                    "_AUTOPAUSE"
+                                    "_AUTOPAUSE",
+                                    "_FIX_WIDESCREEN_FOV"
                                 };
 
-                                // Add scripted mode specific commands
                                 if (!isScriptlessMode)
                                 {
                                     allowedBxtCommands.Add("_JUMPBUG");
@@ -2237,10 +2241,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     textBuffer.Append("\t" + "Disallowed BXT command: " + command + " — Frame: " + i + "\n", IllegalColor);
                                 }
                             }
-                            datanode.Nodes.Add(new TreeNode("Command: " + command)
-                            {
-                                ForeColor = Color.LightGreen
-                            });
                             if (command.ToUpper().StartsWith("LOAD"))
                             {
                                 string loadName = command.Substring(4).ToUpper().Trim();
@@ -2280,10 +2280,14 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                   && !command.ToUpper().Contains("AIM"))
 
                                   || (command.ToUpper().Contains("CL_")
-                                  && !(command.ToUpper().Contains("BOB")
-                                        || command.ToUpper().Contains("SHOWFPS")
-                                        || command.ToUpper().Contains("RIGHTHAND")))
-                                        || (!isScriptlessMode && (command.ToUpper().Contains("PITCHDOWN") || command.ToUpper().Contains("PITCHUP")))
+                                && !(
+                                        command.ToUpper().Contains("BOB")
+                                    || command.ToUpper().Contains("SHOWFPS")
+                                    || command.ToUpper().Contains("RIGHTHAND")
+                                    || (!isScriptlessMode &&
+                                        (command.ToUpper().Contains("PITCHDOWN")
+                                        || command.ToUpper().Contains("PITCHUP")))
+                                    ))
                                 || command.ToUpper().StartsWith("MP_")
                                 || command.ToUpper().StartsWith("R_")
 
