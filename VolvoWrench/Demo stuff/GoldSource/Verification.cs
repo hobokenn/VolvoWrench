@@ -2087,8 +2087,8 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     {
                                         ForeColor = Color.LightSalmon
                                     });
-                                    break;
                                 }
+                                break;
                             }
                         case Bxt.RuntimeDataType.ALIAS_EXPANSION:
                             {
@@ -2236,6 +2236,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 {
                                     textBuffer.Append("\t" + "Disallowed BXT command: " + command + " — Frame: " + i + "\n", IllegalColor);
                                 }
+                            }
                             datanode.Nodes.Add(new TreeNode("Command: " + command)
                             {
                                 ForeColor = Color.LightGreen
