@@ -2063,45 +2063,95 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                         case Bxt.RuntimeDataType.BOUND_COMMAND:
                             {
                                 string command = ((Bxt.BoundCommand)t.Value).command.Trim();
-                                if (command.ToUpper().Contains("+JUMP"))
-                                    jp++;
-                                if (command.ToUpper().Contains("-JUMP"))
-                                    jm++;
-                                if (command.ToUpper().Contains("+DUCK"))
-                                    dp++;
-                                if (command.ToUpper().Contains("-DUCK"))
-                                    dm++;
-                                if (command.ToUpper().Contains(";"))
+                                if (isScriptlessMode)
                                 {
-                                    textBuffer.Append("\t" + "Possible script: " + command + " — Frame: " + i + "\n");
-                                }
-                                if (command.ToUpper().Contains("REPORT_TO_DEMO"))
-                                {
-                                    textBuffer.Append("HL100: Illegal bound report_to_demo command!\n", IllegalColor);
-                                    info.Value.GsDemoInfo.Cheats.Add(command);
+                                    if (command.ToUpper().Contains("+JUMP"))
+                                        jp++;
+                                    if (command.ToUpper().Contains("-JUMP"))
+                                        jm++;
+                                    if (command.ToUpper().Contains("+DUCK"))
+                                        dp++;
+                                    if (command.ToUpper().Contains("-DUCK"))
+                                        dm++;
+                                    if (command.ToUpper().Contains(";"))
+                                    {
+                                        textBuffer.Append("\t" + "Possible script: " + command + " — Frame: " + i + "\n");
+                                    }
+                                    if (command.ToUpper().Contains("REPORT_TO_DEMO"))
+                                    {
+                                        textBuffer.Append("HL100: Illegal bound report_to_demo command!\n", IllegalColor);
+                                        info.Value.GsDemoInfo.Cheats.Add(command);
 
+                                    }
+                                    datanode.Nodes.Add(new TreeNode("Bound command: " + command)
+                                    {
+                                        ForeColor = Color.LightSalmon
+                                    });
+                                    break;
                                 }
-                                datanode.Nodes.Add(new TreeNode("Bound command: " + command)
-                                {
-                                    ForeColor = Color.LightSalmon
-                                });
-                                break;
                             }
                         case Bxt.RuntimeDataType.ALIAS_EXPANSION:
                             {
-                                string aliasCommand = ((Bxt.AliasExpansion)t.Value).command.Trim();
-                                if (aliasCommand.ToUpper().Contains(";"))
+                                string aliasCommand = ((Bxt.AliasExpansion)t.Value).command.Trim();     
+                                if (isScriptlessMode)
                                 {
-                                    textBuffer.Append("\t" + "Alias [" + ((Bxt.AliasExpansion)t.Value).name + "]: " + aliasCommand + " — Frame: " + i + "\n");
+                                    if (aliasCommand.ToUpper().Contains(";"))
+                                    {
+                                        textBuffer.Append("\t" + "Alias [" + ((Bxt.AliasExpansion)t.Value).name + "]: " + aliasCommand + " — Frame: " + i + "\n");
+                                    }
                                 }
+                                else
+                                {
+                                    // Scripted: check for movement commands in aliases
+                                    var moveCmds = new HashSet<string>(StringComparer.OrdinalIgnoreCase) // case insensitive movement commands
+                                    {
+                                        "+left", "+right", "+forward", "+back", "+moveright", "+moveleft"
+                                    };
+                                    
+                                    if (moveCmds.Any(cmd => aliasCommand.IndexOf(cmd, StringComparison.OrdinalIgnoreCase) >= 0))
+                                    {
+                                        string[] commands = aliasCommand.Split(';');
+                                        textBuffer.Append("\t" + "Movement command in alias [" + ((Bxt.AliasExpansion)t.Value).name + "]: ");
+
+                                        foreach (var cmd in commands)
+                                        {
+                                            string trimmedCmd = cmd.Trim();
+                                            bool containsMove = moveCmds.Any(mc =>
+                                                trimmedCmd.IndexOf(mc, StringComparison.OrdinalIgnoreCase) >= 0);
+
+                                            textBuffer.Append(trimmedCmd, containsMove ? WarningColor : mrtb.ForeColor);
+                                            textBuffer.Append("; ", mrtb.ForeColor);
+                                        }
+
+                                        textBuffer.Append("— Frame: " + i + "\n");
+                                    }
+                                }
+                                
                                 datanode.Nodes.Add(new TreeNode("Alias [" + ((Bxt.AliasExpansion)t.Value).name + "]: " + aliasCommand) { ForeColor = Color.LightCyan });
                                 break;
                             }
                         case Bxt.RuntimeDataType.SCRIPT_EXECUTION:
                             {
+                                // NOTE: When there is already enough data in a console command buffer and a config gets executed
+                                // (for example, a config inside a config), if the combined size becomes more than 16 kb of data (cmd_text.maxsize),
+                                // that 2nd config will get skipped and stuffed to the end, thus breaking the order of execution.
+                                // case in point -- https://www.speedrun.com/hl1/runs/zqd4kv5m
+
                                 textBuffer.Append("\t" + "Config execution: " + ((Bxt.ScriptExecution)t.Value).filename + " — Frame: " + i + "\n");
+
+                                // TODO: If someone has their scripts in a sub directory and half-life's cmd_exec_f() gets called
+                                // with e.g. "exec scripts/gauss.cfg", File.WriteAllText() will throw an IO exception.
+
+
                                 //Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\verification cfgs\\");
-                                //File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\verification cfgs\\" + ((Bxt.ScriptExecution)t.Value).filename, ((Bxt.ScriptExecution)t.Value).contents);
+                                //if (((Bxt.ScriptExecution)t.Value).filename == "")
+                                //{
+                                //    File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\verification cfgs\\" + "broken_settings.cfg", ((Bxt.ScriptExecution)t.Value).contents);
+                                //}
+                                //else
+                                //{
+                                //    File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\verification cfgs\\" + ((Bxt.ScriptExecution)t.Value).filename, ((Bxt.ScriptExecution)t.Value).contents);
+                                //}
                                 datanode.Nodes.Add(new TreeNode("Script: " + ((Bxt.ScriptExecution)t.Value).filename)
                                 {
                                     ForeColor = Color.LightSteelBlue,
@@ -2113,8 +2163,11 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 break;
                             }
                         case Bxt.RuntimeDataType.COMMAND_EXECUTION:
+                        {
+                            string command = ((Bxt.CommandExecution)t.Value).command.Trim();
+                            //autojump detection scriptless
+                            if (isScriptlessMode)
                             {
-                                string command = ((Bxt.CommandExecution)t.Value).command.Trim();
                                 if (command.ToUpper().Contains("+JUMP"))
                                 {
                                     if (jp == 0)
@@ -2143,70 +2196,91 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     else
                                         dm--;
                                 }
-                                if (command.ToUpper().Contains("BXT")
-                                  && !(command.ToUpper().Contains("_HUD_TIMER")
-                                  || command.ToUpper().Contains("_HUD_COLOR")
-                                  || command.ToUpper().Contains("_HUD_JUMPSPEED")
-                                  || command.ToUpper().Contains("_HUD_SPEEDOMETER")
-                                  || command.ToUpper().Contains("_HUD_VIEWANGLES")
-                                  || command.ToUpper().Contains("_HUD_INCORRECT_FPS")
-                                  || command.ToUpper().Contains("_HUD_GAME")
-                                  || command.ToUpper().Contains("_DISABLE_NIGHTVISION_SPRITE")
-                                  || command.ToUpper().Contains("_DISABLE_AUTOSAVE")
-                                  || command.ToUpper().Contains("_CROSS")
-                                  || command.ToUpper().Contains("_VIEWMODEL")))
+                            }
+
+                            // BXT command validation - clean whitelist approach
+                            if (command.ToUpper().Contains("BXT"))
+                            {
+                                var allowedBxtCommands = new HashSet<string>
+                                {
+                                    "_HUD_TIMER",
+                                    "_HUD_COLOR",
+                                    "_HUD_JUMPSPEED",
+                                    "_HUD_SPEEDOMETER",
+                                    "_HUD_VIEWANGLES",
+                                    "_HUD_INCORRECT_FPS",
+                                    "_HUD_GAME",
+                                    "_DISABLE_NIGHTVISION_SPRITE",
+                                    "_DISABLE_AUTOSAVE",
+                                    "_CROSS",
+                                    "_VIEWMODEL",
+                                    "_AUTOPAUSE"
+                                };
+
+                                // Add scripted mode specific commands
+                                if (!isScriptlessMode)
+                                {
+                                    allowedBxtCommands.Add("_JUMPBUG");
+                                    allowedBxtCommands.Add("_AUTOJUMP");
+                                    allowedBxtCommands.Add("_DUCKTAP");
+                                    allowedBxtCommands.Add("_APPEND");
+                                }
+
+                                bool isAllowed = allowedBxtCommands.Any(allowed => command.ToUpper().Contains(allowed));
+
+                                if (!isAllowed)
                                 {
                                     textBuffer.Append("\t" + "Disallowed BXT command: " + command + " — Frame: " + i + "\n", IllegalColor);
                                 }
-                                datanode.Nodes.Add(new TreeNode("Command: " + command)
-                                {
-                                    ForeColor = Color.LightGreen
-                                });
-                                if (command.ToUpper().StartsWith("LOAD"))
-                                {
-                                    string loadName = command.Substring(4).ToUpper().Trim();
+                            datanode.Nodes.Add(new TreeNode("Command: " + command)
+                            {
+                                ForeColor = Color.LightGreen
+                            });
+                            if (command.ToUpper().StartsWith("LOAD"))
+                            {
+                                string loadName = command.Substring(4).ToUpper().Trim();
                                     if(loadName == "QUICK" || loadName == "HARD" || loadName == "AUTOSAVE")
-                                    {
-                                        textBuffer.Append("\t" + command + "\n");
-                                    }
-                                    else
-                                    {
-                                        textBuffer.Append("\t" + command + "\n", WarningColor);
-                                    }
-                                }
-                                if (!command.ToUpper().StartsWith("REPORT_TO_DEMO") &&
-                                   ( command.ToUpper().Contains("HOST_")
-                                  || command.ToUpper().Contains("SK_")
-                                  || command.ToUpper().Contains("CHASE")
-                                  || command.ToUpper().Contains("SKILL")
-                                  || command.ToUpper().Contains("WAIT")
-                                  || command.ToUpper().Contains("CONNECT")
-                                  || command.ToUpper().Contains("DELTA")
-                                  || command.ToUpper().Contains("EDGEFRICTION")
-                                  || command.ToUpper().Contains("FS_")
-                                  || command.ToUpper().Contains("MAPCHANGECFGFILE")
-                                  || command.ToUpper().Contains("NOTARGET")
-                                  || command.ToUpper().Contains("PLAYDEMO")
-                                  || command.ToUpper().Contains("S_SHOW")
-                                  || command.ToUpper().Contains("SPEC_POS")
-                                  || command.ToUpper().Contains("THIRDPERSON")
-                                  || command.ToUpper().Contains("SCR_")
-                                  || command.ToUpper().StartsWith("C_")
-                                  || command.ToUpper().Contains("CAM")
-                                  || command.ToUpper().Contains("JOY")))
                                 {
-                                    textBuffer.Append("\t" + "Disallowed: " + command + " — Frame: " + i + "\n", IllegalColor);
+                                    textBuffer.Append("\t" + command + "\n");
                                 }
+                                else
+                                {
+                                    textBuffer.Append("\t" + command + "\n", WarningColor);
+                                }
+                            }
+                            if (!command.ToUpper().StartsWith("REPORT_TO_DEMO") &&
+                                   ( command.ToUpper().Contains("HOST_")
+                                    || command.ToUpper().Contains("SK_")
+                                    || command.ToUpper().Contains("CHASE")
+                                    || command.ToUpper().Contains("SKILL")
+                                    || (command.ToUpper().Contains("WAIT") && isScriptlessMode)
+                                    || command.ToUpper().Contains("CONNECT")
+                                    || command.ToUpper().Contains("DELTA")
+                                    || command.ToUpper().Contains("EDGEFRICTION")
+                                    || command.ToUpper().Contains("FS_")
+                                    || command.ToUpper().Contains("MAPCHANGECFGFILE")
+                                    || command.ToUpper().Contains("NOTARGET")
+                                    || command.ToUpper().Contains("PLAYDEMO")
+                                    || command.ToUpper().Contains("S_SHOW")
+                                    || command.ToUpper().Contains("SPEC_POS")
+                                    || command.ToUpper().Contains("THIRDPERSON")
+                                    || command.ToUpper().Contains("SCR_")
+                                    || command.ToUpper().StartsWith("C_")
+                                    || command.ToUpper().Contains("CAM")
+                                  || command.ToUpper().Contains("JOY")))
+                            {
+                                textBuffer.Append("\t" + "Disallowed: " + command + " — Frame: " + i + "\n", IllegalColor);
+                            }
                                 if ((command.ToUpper().Contains("SV_")
                                   && !command.ToUpper().Contains("AIM"))
 
                                   || (command.ToUpper().Contains("CL_")
                                   && !(command.ToUpper().Contains("BOB")
-                                  || command.ToUpper().Contains("SHOWFPS")
-                                  || command.ToUpper().Contains("RIGHTHAND")))
-
-                                  || command.ToUpper().StartsWith("MP_")
-                                  || command.ToUpper().StartsWith("R_")
+                                        || command.ToUpper().Contains("SHOWFPS")
+                                        || command.ToUpper().Contains("RIGHTHAND")))
+                                        || (!isScriptlessMode && (command.ToUpper().Contains("PITCHDOWN") || command.ToUpper().Contains("PITCHUP")))
+                                || command.ToUpper().StartsWith("MP_")
+                                || command.ToUpper().StartsWith("R_")
 
                                   || (command.ToUpper().Contains("GL_")
                                   && !command.ToUpper().Contains("TEXTUREMODE"))
