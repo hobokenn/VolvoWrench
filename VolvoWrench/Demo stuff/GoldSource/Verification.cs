@@ -1126,29 +1126,57 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                 textBuffer.Append("\nHL100: Got 944 kills with Nihilanth as the final kill.\n\n", Color.Green);
             }
 
+            // Verify expected kills and check for count mismatches
             foreach (var map in referenceMonsterCountsByMap)
             {
                 foreach (var monsterTypeKills in referenceMonsterCountsByMap[map.Key])
                 {
-                    if (!monsterCountsByMap.ContainsKey(map.Key) || !monsterCountsByMap[map.Key].ContainsKey(monsterTypeKills.Key))
+                    string expectedMonster = monsterTypeKills.Key;
+                    int expectedCount = monsterTypeKills.Value;
+                    string mapName = map.Key;
+
+                    if (!monsterCountsByMap.ContainsKey(mapName) || !monsterCountsByMap[mapName].ContainsKey(expectedMonster))
                     {
                         textBuffer.Append(
-                            "HL100: Expected " +
-                            referenceMonsterCountsByMap[map.Key][monsterTypeKills.Key] + " " +
-                            monsterTypeKills.Key + " kills on " +
-                            map.Key + ". Found no kills for this monster type on this map in demos.\n",
+                            $"HL100 Map:{mapName,-6} | SHORT | {expectedMonster} | Expected: {expectedCount,-2} | Got: 0\n",
                             WarningColor);
                         hasWarnings = true;
                     }
+                    else
+                    {
+                        int actualCount = monsterCountsByMap[mapName][expectedMonster];
+                        if (actualCount < expectedCount)
+                        {
+                            textBuffer.Append(
+                                $"HL100 Map:{mapName,-6} | SHORT | {expectedMonster} | Expected: {expectedCount,-2} | Got: {actualCount,-2} ({expectedCount - actualCount} short)\n",
+                                WarningColor);
+                            hasWarnings = true;
+                        }
+                        else if (actualCount > expectedCount)
+                        {
+                            textBuffer.Append(
+                                $"HL100 Map:{mapName,-6} | EXTRA | {expectedMonster} | Expected: {expectedCount,-2} | Got: {actualCount,-2} ({actualCount - expectedCount} extra)\n",
+                                WarningColor);
+                            hasWarnings = true;
+                        }
+                    }
+                }
+            }
 
-                    else if (monsterCountsByMap[map.Key][monsterTypeKills.Key] != referenceMonsterCountsByMap[map.Key][monsterTypeKills.Key])
+            // Find unexpected extra monsters/maps
+            foreach (var actualMap in monsterCountsByMap)
+            {
+                string actualMapName = actualMap.Key;
+                foreach (var actualKills in actualMap.Value)
+                {
+                    string actualMonster = actualKills.Key;
+                    int actualCount = actualKills.Value;
+
+                    if (!referenceMonsterCountsByMap.ContainsKey(actualMapName) || 
+                        !referenceMonsterCountsByMap[actualMapName].ContainsKey(actualMonster))
                     {
                         textBuffer.Append(
-                            "HL100: Expected " +
-                            referenceMonsterCountsByMap[map.Key][monsterTypeKills.Key] + " " +
-                            monsterTypeKills.Key + " kills on " +
-                            map.Key + ". Got " +
-                            monsterCountsByMap[map.Key][monsterTypeKills.Key] + " kills.\n",
+                            $"HL100 Map:{actualMapName,-6} | STRAY | {actualMonster} | Expected: 0  | Got: {actualCount,-2} (unexpected)\n",
                             WarningColor);
                         hasWarnings = true;
                     }
