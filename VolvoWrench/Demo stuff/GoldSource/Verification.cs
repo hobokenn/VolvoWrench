@@ -382,7 +382,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                     {
                         {"monster_human_grunt", 2},
                         {"monster_alien_slave", 7},
-                        {"monster_headcrab", 8},
+                        {"monster_headcrab", 9},
                         {"monster_gargantua", 1},
                     }
                 },
