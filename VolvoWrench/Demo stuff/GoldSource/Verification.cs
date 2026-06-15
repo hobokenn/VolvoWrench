@@ -1540,6 +1540,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             // Add scriptless-specific cvars only in scriptless mode
             if (isScriptlessMode)
             {
+                cvarRules.Add("BXT_AUTOPAUSE", "0");
                 cvarRules.Add("BXT_AUTOJUMP", "0");
                 cvarRules.Add("BXT_AUTOJUMP_PREDICTION", "0");
                 cvarRules.Add("CL_PITCHDOWN", "89");
@@ -2222,7 +2223,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     "_DISABLE_AUTOSAVE",
                                     "_CROSS",
                                     "_VIEWMODEL",
-                                    "_AUTOPAUSE",
                                     "_FIX_WIDESCREEN_FOV"
                                 };
 
@@ -2255,6 +2255,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                             }
                             if (command.ToUpper().Contains("CUST_"))
                             {
+                                //TODO: Verify based on currently equipped weapon
                                 var allowedCust = new HashSet<string>
                                 {
                                     "CUST_11", "CUST_12", "CUST_13", "CUST_14", "CUST_15",
