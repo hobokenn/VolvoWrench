@@ -36,6 +36,11 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         private ColoredTextBuffer textBuffer;
 
         /// <summary>
+        ///     Set of save names made
+        /// </summary>
+        private HashSet<string> saveSet;
+
+        /// <summary>
         ///     Dictionaries related to HL100 kill counting
         /// </summary>
         // Kill Number : UUID, Monster Type, Monster Name, Map
@@ -1209,6 +1214,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             Df.Clear();
             MonsterTypeKillByNumber.Clear();
             MonsterTypeKillByMap.Clear();
+            saveSet = new HashSet<string>();
             mrtb.Font = new Font("Consolas", 12, FontStyle.Regular); // Need a monospaced font for table output
             mrtb.WordWrap = false;
             mrtb.Text = $@"Please wait. Parsing demos... 0/{files.Length}";
@@ -2269,16 +2275,27 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     textBuffer.Append("\t" + "Disallowed BXT command: " + command + " — Frame: " + i + "\n", IllegalColor);
                                 }
                             }
+                            if (command.ToUpper().StartsWith("SAVE"))
+                            {
+                                string saveName = command.Substring(4).ToUpper().Trim();
+                                saveSet.Add(saveName);
+                            }
                             if (command.ToUpper().StartsWith("LOAD"))
                             {
                                 string loadName = command.Substring(4).ToUpper().Trim();
-                                    if(loadName == "QUICK" || loadName == "HARD" || loadName == "AUTOSAVE")
+                                if (saveSet.Contains(loadName))
                                 {
-                                    textBuffer.Append("\t" + command + "\n");
-                                }
-                                else
+                                    if (loadName == "QUICK" || loadName == "HARD" || loadName == "AUTOSAVE")
+                                    {
+                                        textBuffer.Append("\t" + command + "\n");
+                                    }
+                                    else
+                                    {
+                                        textBuffer.Append("\t" + command + "\n", WarningColor);
+                                    }
+                                } else
                                 {
-                                    textBuffer.Append("\t" + command + "\n", WarningColor);
+                                    textBuffer.Append("\t" + command + "\n", IllegalColor);
                                 }
                             }
                             if (command.ToUpper().Contains("CUST_"))
