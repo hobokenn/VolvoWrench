@@ -2280,6 +2280,10 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 string saveName = command.Substring(4).ToUpper().Trim();
                                 saveSet.Add(saveName);
                             }
+                            else if (command.Equals("autosave"))
+                            {
+                                saveSet.Add("AUTOSAVE");
+                            }
                             if (command.ToUpper().StartsWith("LOAD"))
                             {
                                 string loadName = command.Substring(4).ToUpper().Trim();
