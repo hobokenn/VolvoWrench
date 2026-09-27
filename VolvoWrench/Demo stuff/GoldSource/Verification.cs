@@ -59,6 +59,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         public Verification()
         {
             InitializeComponent();
+            mrtb.Font = new Font("Consolas", 12, FontStyle.Regular); // Need a monospaced font for table output
             this.Text = "Verification Scriptless";
             DemopathList = new List<string>();
             this.mrtb.DragDrop += Verification_DragDrop;
@@ -1215,7 +1216,6 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             MonsterTypeKillByNumber.Clear();
             MonsterTypeKillByMap.Clear();
             saveSet = new HashSet<string>();
-            mrtb.Font = new Font("Consolas", 12, FontStyle.Regular); // Need a monospaced font for table output
             mrtb.WordWrap = false;
             mrtb.Text = $@"Please wait. Parsing demos... 0/{files.Length}";
             var curr = 0;
