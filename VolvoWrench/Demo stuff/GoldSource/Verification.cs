@@ -1263,7 +1263,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 {
                     if (dem.Value.GsDemoInfo.Cheats.Count > 0)
                     {
-                        textBuffer.Append("Possible cheats:\n");
+                        textBuffer.Append("Possible cheats:\n", WarningColor);
                         foreach (var cheat in dem.Value.GsDemoInfo.Cheats.Distinct())
                         {
                             textBuffer.Append("\t" + cheat + "\n");
@@ -2110,7 +2110,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                         dm++;
                                     if (command.ToUpper().Contains(";"))
                                     {
-                                        textBuffer.Append("\t" + "Possible script: " + command + " — Frame: " + i + "\n");
+                                        textBuffer.Append("\t" + "Possible script: " + command + " — Frame: " + i + "\n", WarningColor);
                                     }
                                     if (command.ToUpper().Contains("REPORT_TO_DEMO"))
                                     {
@@ -2210,28 +2210,28 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 if (command.ToUpper().Contains("+JUMP"))
                                 {
                                     if (jp == 0)
-                                        textBuffer.Append("\t" + "Possible autojump: " + command + " — Frame: " + i + "\n");
+                                        textBuffer.Append("\t" + "Possible autojump: " + command + " — Frame: " + i + "\n", WarningColor);
                                     else
                                         jp--;
                                 }
                                 if (command.ToUpper().Contains("-JUMP"))
                                 {
                                     if (jm == 0)
-                                        textBuffer.Append("\t" + "Possible autojump: " + command + " — Frame: " + i + "\n");
+                                        textBuffer.Append("\t" + "Possible autojump: " + command + " — Frame: " + i + "\n", WarningColor);
                                     else
                                         jm--;
                                 }
                                 if (command.ToUpper().Contains("+DUCK"))
                                 {
                                     if (dp == 0)
-                                        textBuffer.Append("\t" + "Possible ducktap: " + command + " — Frame: " + i + "\n");
+                                        textBuffer.Append("\t" + "Possible ducktap: " + command + " — Frame: " + i + "\n", WarningColor);
                                     else
                                         dp--;
                                 }
                                 if (command.ToUpper().Contains("-DUCK"))
                                 {
                                     if (dm == 0)
-                                        textBuffer.Append("\t" + "Possible ducktap: " + command + " — Frame: " + i + "\n");
+                                        textBuffer.Append("\t" + "Possible ducktap: " + command + " — Frame: " + i + "\n", WarningColor);
                                     else
                                         dm--;
                                 }
