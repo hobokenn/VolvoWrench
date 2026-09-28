@@ -59,6 +59,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         public Verification()
         {
             InitializeComponent();
+            BXTTreeView.BeforeExpand += BXTTreeView_BeforeExpand;
             mrtb.Font = new Font("Consolas", 12, FontStyle.Regular); // Need a monospaced font for table output
             this.Text = "Verification Scriptless";
             DemopathList = new List<string>();
@@ -2038,13 +2039,11 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 skillCvarRules.ToList().ForEach(x => cvarRules.Add(x.Key, x.Value));
             }
 
-            var demonode = new TreeNode(Path.GetFileName(info.Key)) { ForeColor = Color.LightCoral };
             bool gameEndReported = false;
             
             for (int i = 0; i < info.Value.GsDemoInfo.IncludedBXtData.Count; i++)
             {
                 int jp = 0, jm = 0, dp = 0, dm = 0;
-                var datanode = new TreeNode("\nBXT Data Frame [" + i + "]") { ForeColor = Color.LightPink };
                 for (int index = 0; index < info.Value.GsDemoInfo.IncludedBXtData[i].Objects.Count; index++)
                 {
                     KeyValuePair<Bxt.RuntimeDataType, Bxt.BXTData> t = info.Value.GsDemoInfo.IncludedBXtData[i].Objects[index];
@@ -2054,15 +2053,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                             {
                                 textBuffer.Append("\t" + "BXT Version: " + ((((Bxt.VersionInfo)t.Value).bxt_version == bxtVersion) ? "Latest (September 19th 2026)" : ("INVALID=" + ((Bxt.VersionInfo)t.Value).bxt_version)) + "\n");
                                 textBuffer.Append("\t" + "Game Version: " + ((Bxt.VersionInfo)t.Value).build_number + ", Game Directory: " + gamedir + "\n");
-                                datanode.Nodes.Add(new TreeNode("Version info")
-                                {
-                                    ForeColor = Color.PaleVioletRed,
-                                    Nodes =
-                                    {
-                                        new TreeNode("Game version: " + ((Bxt.VersionInfo) t.Value).build_number) { ForeColor = Color.PaleVioletRed },
-                                        new TreeNode("BXT Version: " + ((Bxt.VersionInfo) t.Value).bxt_version) { ForeColor = Color.PaleVioletRed }
-                                    },
-                                });
                                 break;
                             }
                         case Bxt.RuntimeDataType.CVAR_VALUES:
@@ -2077,14 +2067,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 {
                                     textBuffer.Append("\t" + "Illegal Cvar: " + cvar.Key + " " + cvar.Value + "\n", IllegalColor);
                                 }
-                                var cvarnode = new TreeNode("Cvars [" + ((Bxt.CVarValues)t.Value).CVars.Count + "]")
-                                {
-                                    ForeColor = Color.LightBlue
-                                };
-                                cvarnode.Nodes.AddRange(
-                                    ((Bxt.CVarValues)t.Value).CVars.OrderBy(x => x.Key).Select(
-                                        x => new TreeNode(x.Key + " " + x.Value) { ForeColor = Color.LightBlue }).ToArray());
-                                datanode.Nodes.Add(cvarnode);
                                 break;
                             }
                         case Bxt.RuntimeDataType.TIME:
@@ -2093,10 +2075,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 {
                                     textBuffer.Append("\t" + "Demo bxt time: " + ((Bxt.Time)t.Value).ToString() + " — Frame: " + i + "\n");
                                 }
-                                datanode.Nodes.Add(new TreeNode("Time: " + ((Bxt.Time)t.Value).ToString())
-                                {
-                                    ForeColor = Color.Yellow
-                                });
                                 break;
                             }
                         case Bxt.RuntimeDataType.BOUND_COMMAND:
@@ -2122,10 +2100,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                         info.Value.GsDemoInfo.Cheats.Add(command);
 
                                     }
-                                    datanode.Nodes.Add(new TreeNode("Bound command: " + command)
-                                    {
-                                        ForeColor = Color.LightSalmon
-                                    });
                                 }
                                 break;
                             }
@@ -2166,7 +2140,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     }
                                 }
                                 
-                                datanode.Nodes.Add(new TreeNode("Alias [" + ((Bxt.AliasExpansion)t.Value).name + "]: " + aliasCommand) { ForeColor = Color.LightCyan });
                                 break;
                             }
                         case Bxt.RuntimeDataType.SCRIPT_EXECUTION:
@@ -2191,14 +2164,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 //{
                                 //    File.WriteAllText(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\verification cfgs\\" + ((Bxt.ScriptExecution)t.Value).filename, ((Bxt.ScriptExecution)t.Value).contents);
                                 //}
-                                datanode.Nodes.Add(new TreeNode("Script: " + ((Bxt.ScriptExecution)t.Value).filename)
-                                {
-                                    ForeColor = Color.LightSteelBlue,
-                                    Nodes =
-                                    {
-                                        new TreeNode(((Bxt.ScriptExecution) t.Value).contents) {ForeColor = Color.LightSteelBlue}
-                                    }
-                                });
                                 break;
                             }
                         case Bxt.RuntimeDataType.COMMAND_EXECUTION:
@@ -2240,11 +2205,6 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                         dm--;
                                 }
                             }
-
-                            datanode.Nodes.Add(new TreeNode("Command: " + command)
-                            {
-                                ForeColor = Color.LightGreen
-                            });
 
                             if (command.ToUpper().Contains("BXT"))
                             {
@@ -2422,25 +2382,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     textBuffer.Append("\tGAME END — Frame: " + i + "\n", Color.ForestGreen);
                                     gameEndReported = true;
                                 }
-                                datanode.Nodes.Add(new TreeNode("-- GAME END --") { ForeColor = Color.ForestGreen });
-                                break;
-                            }
-                        case Bxt.RuntimeDataType.LOADED_MODULES:
-                            {
-                                var modulesnode = new TreeNode("Loaded modules [" + ((Bxt.LoadedModules)t.Value).filenames.Count + "]") { ForeColor = Color.LightGreen };
-                                modulesnode.Nodes.AddRange(((Bxt.LoadedModules)t.Value).filenames.Select(x => new TreeNode(x) { ForeColor = Color.LightGreen }).ToArray());
-                                datanode.Nodes.Add(modulesnode);
                                 break;
                             }
                         case Bxt.RuntimeDataType.CUSTOM_TRIGGER_COMMAND:
                             {
                                 var trigger = (Bxt.CustomTriggerCommand)t.Value;
                                 textBuffer.Append("\t" + $"Custom trigger X1:{trigger.corner_max.X} Y1:{trigger.corner_max.Y} Z1:{trigger.corner_max.Z} X2:{trigger.corner_min.X} Y2:{trigger.corner_min.Y} Z2:{trigger.corner_min.Z}" + " — Frame: " + i + "\n");
-                                datanode.Nodes.Add(new TreeNode($"Custom trigger X1:{trigger.corner_max.X} Y1:{trigger.corner_max.Y} Z1:{trigger.corner_max.Z} X2:{trigger.corner_min.X} Y2:{trigger.corner_min.Y} Z2:{trigger.corner_min.Z}")
-                                {
-                                    ForeColor = Color.Orange,
-                                    Nodes = { new TreeNode("Command: " + trigger.command) { ForeColor = Color.Orange } }
-                                });
                                 break;
                             }
                         case Bxt.RuntimeDataType.EDICTS:
@@ -2449,23 +2396,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 {
                                     textBuffer.Append("\t" + "Max edicts value is higher than 900: " + ((Bxt.Edicts)t.Value).edicts + "\n", IllegalColor);
                                 }
-                                datanode.Nodes.Add(new TreeNode("Max edicts: " + ((Bxt.Edicts)t.Value).edicts) { ForeColor = Color.Violet });
-                                break;
-                            }
-                        case Bxt.RuntimeDataType.PLAYERHEALTH:
-                            {
-                                datanode.Nodes.Add(new TreeNode("Player health: " + ((Bxt.PlayerHealth)t.Value).playerhealth) { ForeColor = Color.LightSalmon });
                                 break;
                             }
                         case Bxt.RuntimeDataType.SPLIT_MARKER:
                             {
                                 var split = (Bxt.SplitMarker)t.Value;
                                 textBuffer.Append("\t" + $"Split trigger X1:{split.corner_max.X} Y1:{split.corner_max.Y} Z1:{split.corner_max.Z} X2:{split.corner_min.X} Y2:{split.corner_min.Y} Z2:{split.corner_min.Z}" + " — Frame: " + i + "\n");
-                                datanode.Nodes.Add(new TreeNode($"Split trigger X1:{split.corner_max.X} Y1:{split.corner_max.Y} Z1:{split.corner_max.Z} X2:{split.corner_min.X} Y2:{split.corner_min.Y} Z2:{split.corner_min.Z}")
-                                {
-                                    ForeColor = Color.Orange,
-                                    Nodes = { new TreeNode("Name: " + split.name + " | Map name: " + split.map_name) { ForeColor = Color.Orange } }
-                                });
                                 break;
                             }
                         case Bxt.RuntimeDataType.FLAGS:
@@ -2476,19 +2412,194 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 {
                                     textBuffer.Append("\tThis runner has used bxt_enable_big_map and didn't restart the game before the run. This command is not intended for RTA leaderboard runs.\n", IllegalColor);
                                 }
-                                datanode.Nodes.Add(new TreeNode("BXT Flags: " + bxtFlags) { ForeColor = Color.LightSalmon });
-                                break;
-                            }
-                        default:
-                            {
-                                datanode.Nodes.Add(new TreeNode("Invalid bxt data!") { ForeColor = Color.Red });
                                 break;
                             }
                     }
                 }
-                demonode.Nodes.Add(datanode);
             }
-            BXTTreeView.Nodes.Add(demonode);
+            AddDemoTree(info.Key, info.Value);
+        }
+
+        private sealed class PendingDemoTree
+        {
+            public CrossParseResult Demo;
+            public bool Scriptless;
+        }
+
+        private void AddDemoTree(string path, CrossParseResult demo)
+        {
+            // Create only the demo name, BXT details are loaded when expanded.
+            var node = new TreeNode(Path.GetFileName(path)) { ForeColor = Color.LightCoral };
+            if (demo.GsDemoInfo.IncludedBXtData.Count > 0)
+            {
+                node.Tag = new PendingDemoTree { Demo = demo, Scriptless = isScriptlessMode };
+                node.Nodes.Add("Expand to load BXT data");
+            }
+            BXTTreeView.Nodes.Add(node);
+        }
+
+        private void BXTTreeView_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            var pending = e.Node.Tag as PendingDemoTree;
+            if (pending == null)
+                return;
+
+            // expands the demo, build all its frames and BXT detail nodes.
+            var nodes = BuildDemoTreeNodes(pending.Demo, pending.Scriptless);
+            BXTTreeView.BeginUpdate();
+            try
+            {
+                e.Node.Nodes.Clear();
+                e.Node.Nodes.AddRange(nodes);
+                e.Node.Tag = null; // Later expansions reuse the nodes.
+            }
+            finally
+            {
+                BXTTreeView.EndUpdate();
+            }
+        }
+
+        private static TreeNode[] BuildDemoTreeNodes(CrossParseResult demo, bool scriptless)
+        {
+            var nodes = new List<TreeNode>();
+            for (int i = 0; i < demo.GsDemoInfo.IncludedBXtData.Count; i++)
+            {
+                var datanode = new TreeNode("\nBXT Data Frame [" + i + "]") { ForeColor = Color.LightPink };
+                foreach (var t in demo.GsDemoInfo.IncludedBXtData[i].Objects)
+                {
+                    switch (t.Key)
+                    {
+                        case Bxt.RuntimeDataType.VERSION_INFO:
+                        {
+                            datanode.Nodes.Add(new TreeNode("Version info")
+                            {
+                                ForeColor = Color.PaleVioletRed,
+                                Nodes =
+                                {
+                                    new TreeNode("Game version: " + ((Bxt.VersionInfo) t.Value).build_number) { ForeColor = Color.PaleVioletRed },
+                                    new TreeNode("BXT Version: " + ((Bxt.VersionInfo) t.Value).bxt_version) { ForeColor = Color.PaleVioletRed }
+                                },
+                            });
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.CVAR_VALUES:
+                        {
+                            var cvarnode = new TreeNode("Cvars [" + ((Bxt.CVarValues)t.Value).CVars.Count + "]")
+                            {
+                                ForeColor = Color.LightBlue
+                            };
+                            cvarnode.Nodes.AddRange(
+                                ((Bxt.CVarValues)t.Value).CVars.OrderBy(x => x.Key).Select(
+                                    x => new TreeNode(x.Key + " " + x.Value) { ForeColor = Color.LightBlue }).ToArray());
+                            datanode.Nodes.Add(cvarnode);
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.TIME:
+                        {
+                            datanode.Nodes.Add(new TreeNode("Time: " + ((Bxt.Time)t.Value).ToString())
+                            {
+                                ForeColor = Color.Yellow
+                            });
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.BOUND_COMMAND:
+                        {
+                            if (!scriptless)
+                                break;
+                            string command = ((Bxt.BoundCommand)t.Value).command.Trim();
+                            datanode.Nodes.Add(new TreeNode("Bound command: " + command)
+                            {
+                                ForeColor = Color.LightSalmon
+                            });
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.ALIAS_EXPANSION:
+                        {
+                            string aliasCommand = ((Bxt.AliasExpansion)t.Value).command.Trim();
+                            datanode.Nodes.Add(new TreeNode("Alias [" + ((Bxt.AliasExpansion)t.Value).name + "]: " + aliasCommand) { ForeColor = Color.LightCyan });
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.SCRIPT_EXECUTION:
+                        {
+                            datanode.Nodes.Add(new TreeNode("Script: " + ((Bxt.ScriptExecution)t.Value).filename)
+                            {
+                                ForeColor = Color.LightSteelBlue,
+                                Nodes =
+                                {
+                                    new TreeNode(((Bxt.ScriptExecution) t.Value).contents) {ForeColor = Color.LightSteelBlue}
+                                }
+                            });
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.COMMAND_EXECUTION:
+                        {
+                            string command = ((Bxt.CommandExecution)t.Value).command.Trim();
+                            if (command.ToUpper().StartsWith("BIND") || command.ToUpper().StartsWith("ALIAS"))
+                                break;
+                            datanode.Nodes.Add(new TreeNode("Command: " + command)
+                            {
+                                ForeColor = Color.LightGreen
+                            });
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.GAME_END_MARKER:
+                        {
+                            datanode.Nodes.Add(new TreeNode("-- GAME END --") { ForeColor = Color.ForestGreen });
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.LOADED_MODULES:
+                        {
+                            var modulesnode = new TreeNode("Loaded modules [" + ((Bxt.LoadedModules)t.Value).filenames.Count + "]") { ForeColor = Color.LightGreen };
+                            modulesnode.Nodes.AddRange(((Bxt.LoadedModules)t.Value).filenames.Select(x => new TreeNode(x) { ForeColor = Color.LightGreen }).ToArray());
+                            datanode.Nodes.Add(modulesnode);
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.CUSTOM_TRIGGER_COMMAND:
+                        {
+                            var trigger = (Bxt.CustomTriggerCommand)t.Value;
+                            datanode.Nodes.Add(new TreeNode($"Custom trigger X1:{trigger.corner_max.X} Y1:{trigger.corner_max.Y} Z1:{trigger.corner_max.Z} X2:{trigger.corner_min.X} Y2:{trigger.corner_min.Y} Z2:{trigger.corner_min.Z}")
+                            {
+                                ForeColor = Color.Orange,
+                                Nodes = { new TreeNode("Command: " + trigger.command) { ForeColor = Color.Orange } }
+                            });
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.EDICTS:
+                        {
+                            datanode.Nodes.Add(new TreeNode("Max edicts: " + ((Bxt.Edicts)t.Value).edicts) { ForeColor = Color.Violet });
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.PLAYERHEALTH:
+                        {
+                            datanode.Nodes.Add(new TreeNode("Player health: " + ((Bxt.PlayerHealth)t.Value).playerhealth) { ForeColor = Color.LightSalmon });
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.SPLIT_MARKER:
+                        {
+                            var split = (Bxt.SplitMarker)t.Value;
+                            datanode.Nodes.Add(new TreeNode($"Split trigger X1:{split.corner_max.X} Y1:{split.corner_max.Y} Z1:{split.corner_max.Z} X2:{split.corner_min.X} Y2:{split.corner_min.Y} Z2:{split.corner_min.Z}")
+                            {
+                                ForeColor = Color.Orange,
+                                Nodes = { new TreeNode("Name: " + split.name + " | Map name: " + split.map_name) { ForeColor = Color.Orange } }
+                            });
+                            break;
+                        }
+                        case Bxt.RuntimeDataType.FLAGS:
+                        {
+                            int bxtFlags = ((Bxt.Flags)t.Value).flags;
+                            datanode.Nodes.Add(new TreeNode("BXT Flags: " + bxtFlags) { ForeColor = Color.LightSalmon });
+                            break;
+                        }
+                        default:
+                        {
+                            datanode.Nodes.Add(new TreeNode("Invalid bxt data!") { ForeColor = Color.Red });
+                            break;
+                        }
+                    }
+                }
+                nodes.Add(datanode);
+            }
+            return nodes.ToArray();
         }
 
         private void Verification_DragEnter(object sender, DragEventArgs e)
