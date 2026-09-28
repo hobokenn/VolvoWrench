@@ -1240,6 +1240,10 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                 MessageBox.Show(@"Only goldsource supported");
             else
             {
+                // Decide the mode before any verification results or HL100 checks are produced.
+                if (Df.Count > 0)
+                    CheckVerificationMode(files.First(Df.ContainsKey));
+
                 mrtb.Text = "";
                 textBuffer.Append("" + "\n");
                 textBuffer.Append("Parsed demos. Results:" + "\n");
@@ -2509,11 +2513,64 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
             mrtb.Text = "Demos cleared, ready to parse\n";
         }
 
-        private void toggleModeToolStripMenuItem_Click(object sender, EventArgs e)
+        private void CheckVerificationMode(string firstDemoPath)
         {
-            isScriptlessMode = !isScriptlessMode;
+            bool hasAutojump = FirstDemoHasAutojump(Df[firstDemoPath]);
+            bool shouldUseScriptless = !hasAutojump;
+            if (isScriptlessMode == shouldUseScriptless)
+                return;
+
+            string suggestedMode = shouldUseScriptless ? "Scriptless" : "Scripted";
+            string reason = hasAutojump
+                ? "The first demo contains bxt_autojump 1 or +bxt_tas_autojump."
+                : "The first demo contains neither bxt_autojump 1 nor +bxt_tas_autojump.";
+
+            var answer = MessageBox.Show(this, reason
+                + "\n\nSwitch to " + suggestedMode + " mode for this batch?"
+                , "Verification mode", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (answer == DialogResult.Yes)
+                SetVerificationMode(shouldUseScriptless);
+        }
+
+        private static bool FirstDemoHasAutojump(CrossParseResult demo)
+        {
+            foreach (var frame in demo.GsDemoInfo.IncludedBXtData)
+            {
+                foreach (var entry in frame.Objects)
+                {
+                    switch (entry.Key)
+                    {
+                        case Bxt.RuntimeDataType.CVAR_VALUES:
+                            foreach (var cvar in ((Bxt.CVarValues)entry.Value).CVars)
+                            {
+                                if (cvar.Key.Equals("bxt_autojump", StringComparison.OrdinalIgnoreCase)
+                                    && cvar.Value.Trim() == "1")
+                                    return true;
+                            }
+                            break;
+
+                        case Bxt.RuntimeDataType.COMMAND_EXECUTION:
+                            string command = ((Bxt.CommandExecution)entry.Value).command.Trim();
+                            if (command.ToLowerInvariant().Contains("+bxt_tas_autojump"))
+                                return true;
+                            break;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private void SetVerificationMode(bool scriptless)
+        {
+            isScriptlessMode = scriptless;
             toggleModeToolStripMenuItem.Text = isScriptlessMode ? "Scriptless" : "Scripted";
             this.Text = isScriptlessMode ? "Verification Scriptless" : "Verification Scripted";
+        }
+
+        private void toggleModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetVerificationMode(!isScriptlessMode);
         }
     }
 }
