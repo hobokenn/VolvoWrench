@@ -1213,10 +1213,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         public void Verify(string[] files)
         {
             files = files.OrderBy(f => demoNumberFromString(f)).ToArray(); // HL100 needs the demos to be parsed in order
-            Df.Clear();
-            MonsterTypeKillByNumber.Clear();
-            MonsterTypeKillByMap.Clear();
-            saveSet = new HashSet<string>();
+            ClearBatch();
             mrtb.WordWrap = false;
             mrtb.Text = $@"Please wait. Parsing demos... 0/{files.Length}";
             var curr = 0;
@@ -2617,11 +2614,29 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
         private void clearDemosButton_Click(object sender, EventArgs e)
         {
             mrtb.Text = "Deleting bxt tree nodes, this may take a while...\n";
-            DemopathList.Clear();
-            BXTTreeView.BeginUpdate();
-            BXTTreeView.Nodes.Clear();
-            BXTTreeView.EndUpdate();
+            ClearBatch();
             mrtb.Text = "Demos cleared, ready to parse\n";
+        }
+
+        private void ClearBatch()
+        {
+            // Clear and starting a new batch both discard all previous demo data and results.
+            BXTTreeView.BeginUpdate();
+            try
+            {
+                BXTTreeView.Nodes.Clear();
+                Df.Clear();
+                DemopathList.Clear();
+                MonsterTypeKillByNumber.Clear();
+                MonsterTypeKillByMap.Clear();
+                saveSet = new HashSet<string>();
+                textBuffer.Clear();
+                mrtb.Clear();
+            }
+            finally
+            {
+                BXTTreeView.EndUpdate();
+            }
         }
 
         private void CheckVerificationMode(string firstDemoPath)
