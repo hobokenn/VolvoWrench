@@ -84,7 +84,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             }
             else
             {
-                mrtb.Text = @"No file selected/bad file selected!";
+                SetResultsText(@"No file selected/bad file selected!");
             }
         }
 
@@ -1215,13 +1215,13 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
             files = files.OrderBy(f => demoNumberFromString(f)).ToArray(); // HL100 needs the demos to be parsed in order
             ClearBatch();
             mrtb.WordWrap = false;
-            mrtb.Text = $@"Please wait. Parsing demos... 0/{files.Length}";
+            SetResultsText($@"Please wait. Parsing demos... 0/{files.Length}");
             var curr = 0;
             foreach (var dt in files.Where(file => File.Exists(file) && Path.GetExtension(file) == ".dem"))
             {
                 DemopathList.Add(dt);
                 Df.Add(dt, CrossDemoParser.Parse(dt)); //If someone bothers me that its slow make it async.
-                mrtb.Text = $@"Please wait. Parsing demos... {curr++}/{files.Length}";
+                SetResultsText($@"Please wait. Parsing demos... {curr++}/{files.Length}");
             }
             if (Df.Any(x => x.Value.GsDemoInfo.ParsingErrors.Count > 0))
             {
@@ -1231,7 +1231,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                 MessageBox.Show(@"Broken demos found:
 " + brokendemos, @"Error!", MessageBoxButtons.OK);
                 Main.Log("Broken demos when verification: " + brokendemos);
-                mrtb.Text = @"Please fix the demos then reselect the files!";
+                SetResultsText(@"Please fix the demos then reselect the files!");
                 return;
             }
             if (Df.Any(x => x.Value.Type != Parseresult.GoldSource))
@@ -1242,7 +1242,7 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
                 if (Df.Count > 0)
                     CheckVerificationMode(files.First(Df.ContainsKey));
 
-                mrtb.Text = "";
+                SetResultsText("");
                 textBuffer.Append("" + "\n");
                 textBuffer.Append("Parsed demos. Results:" + "\n");
                 textBuffer.Append("General stats:" + "\n");
@@ -1260,7 +1260,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 textBuffer.Append("Demo cheat check:" + "\n");
                 BXTTreeView.BeginUpdate();  //prevent UI tree updates during processing
                 var cur = 0;
-                mrtb.Text = $@"Please wait. Analyzing demos... 0/{files.Length}";
+                SetResultsText($@"Please wait. Analyzing demos... 0/{files.Length}");
                 foreach (var dem in Df)
                 {
                     if (dem.Value.GsDemoInfo.Cheats.Count > 0)
@@ -1275,14 +1275,14 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                     textBuffer.Append("\nBXTData:\n");
                     ParseBxtData(dem);
                     textBuffer.Append("\n");
-                    mrtb.Text = $@"Please wait. Analyzing demos... {cur++}/{files.Length}";
+                    SetResultsText($@"Please wait. Analyzing demos... {cur++}/{files.Length}");
                     Application.DoEvents();
                 }
                 if (MonsterTypeKillByNumber.Count > 0)
                 {
                     VerifyHl100Kills(files, textBuffer);
                 }
-                mrtb.Clear();
+                SetResultsText("");
                 textBuffer.AppendToRichTextBox(mrtb);
                 textBuffer.Clear();
                 BXTTreeView.EndUpdate();    //draw treeview after processing
@@ -2613,9 +2613,18 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
 
         private void clearDemosButton_Click(object sender, EventArgs e)
         {
-            mrtb.Text = "Deleting bxt tree nodes, this may take a while...\n";
+            SetResultsText("Deleting bxt tree nodes, this may take a while...\n");
             ClearBatch();
-            mrtb.Text = "Demos cleared, ready to parse\n";
+            SetResultsText("Demos cleared, ready to parse\n");
+        }
+
+        private void SetResultsText(string text)
+        {
+            // Remember the zoom level before changing the text.
+            float zoom = mrtb.ZoomFactor;
+            mrtb.Text = text;
+            mrtb.ZoomFactor = 1;
+            mrtb.ZoomFactor = zoom;
         }
 
         private void ClearBatch()
@@ -2631,7 +2640,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 MonsterTypeKillByMap.Clear();
                 saveSet = new HashSet<string>();
                 textBuffer.Clear();
-                mrtb.Clear();
+                SetResultsText("");
             }
             finally
             {
