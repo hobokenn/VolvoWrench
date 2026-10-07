@@ -54,6 +54,20 @@ namespace VolvoWrench.Demo_stuff.GoldSource
 			public byte seconds;
 			public double remainder;
 
+            public Time Difference(Time startTime)
+            {
+                double totalSeconds = hours * 3600.0 + minutes * 60.0 + seconds + remainder
+                    - (startTime.hours * 3600.0 + startTime.minutes * 60.0 + startTime.seconds + startTime.remainder);
+                double wholeSeconds = Math.Floor(totalSeconds);
+                return new Time
+                {
+                    hours = (uint)(wholeSeconds / 3600),
+                    minutes = (byte)((wholeSeconds % 3600) / 60),
+                    seconds = (byte)(wholeSeconds % 60),
+                    remainder = totalSeconds - wholeSeconds
+                };
+            }
+
 			public override string ToString()
 			{
 			    return hours + ":" + minutes + ":" + (seconds + remainder).ToString("F4");

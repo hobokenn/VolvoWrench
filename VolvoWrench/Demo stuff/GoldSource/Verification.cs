@@ -52,6 +52,8 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         ///     Toggle between Scriptless and Scripted modes
         /// </summary>
         private bool isScriptlessMode = true;
+        private Bxt.Time blueShiftStartTime = new Bxt.Time();
+        private bool blueShiftStartTimeRecorded;
 
         /// <summary>
         ///     Default constructor
@@ -2166,6 +2168,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                         case Bxt.RuntimeDataType.COMMAND_EXECUTION:
                         {
                             string command = ((Bxt.CommandExecution)t.Value).command.Trim();
+                            if (!blueShiftStartTimeRecorded && command.Equals("changelevel2 ba_security1 tram3_security1", StringComparison.OrdinalIgnoreCase))
+                            {
+                                blueShiftStartTime = (Bxt.Time)info.Value.GsDemoInfo.IncludedBXtData[i].Objects.First(entry => entry.Key == Bxt.RuntimeDataType.TIME).Value;
+                                blueShiftStartTimeRecorded = true;
+                                textBuffer.Append("\tBS start offset: " + blueShiftStartTime + " — Frame: " + i + "\n");
+                            }
                             if (command.ToUpper().StartsWith("BIND") || command.ToUpper().StartsWith("ALIAS"))
                             {
                                 break;  // Creating any binds/aliases are legal. Check legality during expansion/execution
@@ -2377,6 +2385,12 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                 if (!gameEndReported)
                                 {
                                     textBuffer.Append("\tGAME END — Frame: " + i + "\n", Color.ForestGreen);
+                                    if (info.Value.GsDemoInfo.Header.MapName.StartsWith("ba_"))
+                                    {
+                                        var finalBxtTime = info.Value.GsDemoInfo.IncludedBXtData[i].Objects.First(entry => entry.Key == Bxt.RuntimeDataType.TIME).Value as Bxt.Time;
+                                        var retimed = finalBxtTime.Difference(blueShiftStartTime);
+                                        textBuffer.Append($"\tB RETIME - {retimed} ({finalBxtTime} - {blueShiftStartTime.ToString().Split(':').Last()})\n", GoodColor);
+                                    }
                                     gameEndReported = true;
                                 }
                                 break;
@@ -2640,6 +2654,8 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                 MonsterTypeKillByNumber.Clear();
                 MonsterTypeKillByMap.Clear();
                 saveSet = new HashSet<string>();
+                blueShiftStartTime = new Bxt.Time();
+                blueShiftStartTimeRecorded = false;
                 textBuffer.Clear();
                 SetResultsText("");
             }
