@@ -49,7 +49,6 @@ namespace VolvoWrench
             this.netdecodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.heatmapGeneratorToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.statisticsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.multidemoToolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.demoVerificationToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.demoTimerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.goldSourceToolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -154,6 +153,7 @@ namespace VolvoWrench
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
+            this.demoVerificationToolToolStripMenuItem,
             this.demoToolsToolStripMenuItem,
             this.saveToolsToolStripMenuItem,
             this.mapToolsToolStripMenuItem,
@@ -199,7 +199,7 @@ namespace VolvoWrench
             // 
             this.demoToolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.SourceToolsToolStripMenuItem,
-            this.multidemoToolsToolStripMenuItem,
+            this.demoTimerToolStripMenuItem,
             this.goldSourceToolsToolStripMenuItem});
             this.demoToolsToolStripMenuItem.ForeColor = System.Drawing.SystemColors.Control;
             this.demoToolsToolStripMenuItem.Name = "demoToolsToolStripMenuItem";
@@ -244,24 +244,13 @@ namespace VolvoWrench
             this.statisticsToolStripMenuItem.Text = "Statistics";
             this.statisticsToolStripMenuItem.Click += new System.EventHandler(this.statisticsToolStripMenuItem_Click);
             // 
-            // multidemoToolsToolStripMenuItem
-            // 
-            this.multidemoToolsToolStripMenuItem.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.multidemoToolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.demoVerificationToolToolStripMenuItem,
-            this.demoTimerToolStripMenuItem});
-            this.multidemoToolsToolStripMenuItem.ForeColor = System.Drawing.SystemColors.Control;
-            this.multidemoToolsToolStripMenuItem.Name = "multidemoToolsToolStripMenuItem";
-            this.multidemoToolsToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
-            this.multidemoToolsToolStripMenuItem.Text = "Multi-demo tools";
-            // 
             // demoVerificationToolToolStripMenuItem
             // 
             this.demoVerificationToolToolStripMenuItem.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.demoVerificationToolToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
             this.demoVerificationToolToolStripMenuItem.Name = "demoVerificationToolToolStripMenuItem";
-            this.demoVerificationToolToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
-            this.demoVerificationToolToolStripMenuItem.Text = "Demo verification tool";
+            this.demoVerificationToolToolStripMenuItem.Size = new System.Drawing.Size(80, 20);
+            this.demoVerificationToolToolStripMenuItem.Text = "Verification";
             this.demoVerificationToolToolStripMenuItem.Click += new System.EventHandler(this.demoVerificationToolToolStripMenuItem_Click);
             // 
             // demoTimerToolStripMenuItem
@@ -508,7 +497,6 @@ namespace VolvoWrench
         private ToolStripMenuItem netdecodeToolStripMenuItem;
         private ToolStripMenuItem heatmapGeneratorToolStripMenuItem1;
         private ToolStripMenuItem statisticsToolStripMenuItem;
-        private ToolStripMenuItem multidemoToolsToolStripMenuItem;
         private ToolStripMenuItem demoVerificationToolToolStripMenuItem;
         private ToolStripMenuItem goldSourceToolsToolStripMenuItem;
         private ToolStripMenuItem demoDoctorToolStripMenuItem;
