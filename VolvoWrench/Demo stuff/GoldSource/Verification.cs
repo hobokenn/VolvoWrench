@@ -2607,8 +2607,9 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
         private void Verification_DragDrop(object sender, DragEventArgs e)
         {
             var dropfiles = (string[]) e.Data.GetData(DataFormats.FileDrop);
-            Verify(dropfiles);
             e.Effect = DragDropEffects.None;
+            // Let the drop operation finish before changing the text box.
+            BeginInvoke(new Action(() => Verify(dropfiles)));
         }
 
         private void clearDemosButton_Click(object sender, EventArgs e)
