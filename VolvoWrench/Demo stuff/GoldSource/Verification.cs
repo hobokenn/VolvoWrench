@@ -52,7 +52,15 @@ namespace VolvoWrench.Demo_Stuff.GoldSource
         ///     Toggle between Scriptless and Scripted modes
         /// </summary>
         private bool isScriptlessMode = true;
+        
+        /// <summary>
+        ///     Timestamp at Blue Shift start, used for retiming
+        /// </summary>
         private Bxt.Time blueShiftStartTime = new Bxt.Time();
+
+        /// <summary>
+        ///     Indicates if start timestamp has been recorded
+        /// </summary>
         private bool blueShiftStartTimeRecorded;
 
         /// <summary>
@@ -2389,7 +2397,7 @@ Human readable time:        {TimeSpan.FromSeconds(Df.Sum(x => x.Value.GsDemoInfo
                                     {
                                         var finalBxtTime = info.Value.GsDemoInfo.IncludedBXtData[i].Objects.First(entry => entry.Key == Bxt.RuntimeDataType.TIME).Value as Bxt.Time;
                                         var retimed = finalBxtTime.Difference(blueShiftStartTime);
-                                        textBuffer.Append($"\tB RETIME - {retimed} ({finalBxtTime} - {blueShiftStartTime.ToString().Split(':').Last()})\n", GoodColor);
+                                        textBuffer.Append($"\tBS RETIME - {retimed} ({finalBxtTime} - {blueShiftStartTime.ToString().Split(':').Last()})\n", GoodColor);
                                     }
                                     gameEndReported = true;
                                 }
